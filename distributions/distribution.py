@@ -1,11 +1,13 @@
+from abc import ABC, abstractmethod
 import numpy as np
 
 from distributions.sequence import Sequence
 
-class Distribution:
+class Distribution(ABC):
     def __init__(self) -> None:
         pass
 
-    def generate(length: int, rng: np.random.Generator) -> Sequence:
-        raise Exception("Function not implemented")   
+    @abstractmethod
+    def generate(length: int, context_rng: np.random.Generator, theta_rng: np.random.Generator) -> Sequence:
+        raise NotImplementedError
 

@@ -6,10 +6,12 @@ from distributions.distribution import Distribution
 from algorithms.algorithm import Algorithm
 from distributions.sequence import Sequence
 
-def single_run(algorithm: Algorithm, sequence: Sequence):
-    pass
+def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequence) -> float:
+    loss, _ = algorithm.run_on_sequence(rng, sequence)[0]
+    loss_of_optimal_policy, _, _ = sequence.find_optimal_policy()
+    return loss - loss_of_optimal_policy
 
-def single_run_helper(args):
+def single_run_helper(args) -> float:
     return single_run(*args)
 
 class ExperimentManager:
@@ -36,7 +38,7 @@ class ExperimentManager:
 
         for alg_index, algorithm in enumerate(algorithms):
             for index, seq in enumerate(sequences.flatten()):
-                results[alg_index][index] = algorithm.run_on_sequence(self.next_rng(), seq)[0]
+                results[alg_index][index] = single_run(self.next_rng(), algorithm, seq)
             
 
         self.seed_sequence = None
