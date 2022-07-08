@@ -11,15 +11,15 @@ class Sequence:
         self.current_index = 0
 
     @property
-    def d(self) -> np.int:
+    def d(self) -> int:
         return self.theta.shape[1]
 
     @property
-    def K(self) -> np.int:
+    def K(self) -> int:
         return self.theta.shape[2]
 
     @property
-    def length(self) -> np.int:
+    def length(self) -> int:
         return self.theta.shape[0]
 
     @property

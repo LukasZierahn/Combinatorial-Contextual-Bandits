@@ -43,7 +43,7 @@ class SemiBanditExp3(Algorithm):
         self.gamma = np.sqrt(max_term * log_A * log_term / length)
         self.eta = np.sqrt(log_A / (length * max_term * log_term))
 
-        self.M = np.int(np.ceil(len(self.exploratory_set) * m / (self.beta * lambda_min) * log_term))
+        self.M = int(np.ceil(len(self.exploratory_set) * m / (self.beta * lambda_min) * log_term))
 
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
@@ -51,10 +51,6 @@ class SemiBanditExp3(Algorithm):
         exploration_bonus[self.exploratory_set] += 1/len(self.exploratory_set)
 
         action_scores = np.einsum("a,bac,ec->e", context, self.theta_estimates[:self.theta_position], self.actionset)
-        if self.theta_position == 1 and False:
-            print(context, self.theta_estimates[:self.theta_position], self.actionset)
-            print(action_scores)
-            1/0 
 
         action_scores = np.exp(-self.eta * action_scores)
         action_scores /= np.sum(action_scores)
