@@ -1,5 +1,5 @@
 import numpy as np
-from distribution import Distribution
+from distributions.distribution import Distribution
 from distributions.sequence import Sequence
 
 class DistributionBySequence(Distribution):

@@ -2,13 +2,11 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from distributions.sequence import Sequence
-
-
 class Context(ABC):
-    def __init__(self, d: int, true_sigma: float) -> None:
+    def __init__(self, d: int, true_sigma: float, lambda_min: float) -> None:
         self.true_sigma: float = true_sigma
-        self.d = d
+        self.d: int = d
+        self.lambda_min: float = lambda_min
 
     def generate(self, length: int, rng: np.random.Generator) -> np.ndarray:
         result = np.zeros((length, self.d))

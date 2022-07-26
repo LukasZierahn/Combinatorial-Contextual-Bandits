@@ -1,5 +1,4 @@
 from functools import partial
-from typing import Callable
 import numpy as np
 
 from algorithms.algorithm import Algorithm

@@ -6,11 +6,22 @@ from distributions.thetas.thetas import Thetas
 
 class SingleHole(Thetas):
     def __init__(self, K: int, d: int, p: np.ndarray=None) -> None:
+        super().__init__(K, d, np.sqrt(K - 1))
         self.K: int = K
         self.d = d
         self.p = p
-        if p == None:
+        if isinstance(p, list):
+            self.p = np.array(p)
+
+        if p is None:
             self.p = np.ones(K)/K
+
+    def unbiased_sample(self, rng: np.random.Generator):
+        thetas = np.ones((self.d, self.K))
+        set_to_zero = rng.integers(self.K * self.d)
+        thetas[set_to_zero//self.K, set_to_zero%self.K] = 0
+
+        return thetas
 
     def generate(self, length: int, rng: np.random.Generator) -> np.ndarray:
         thetas = np.ones((length, self.d, self.K))

@@ -1,12 +1,15 @@
 from typing import Callable, Dict, Tuple
 import numpy as np
 
+from distributions.contexts.context import Context
+from distributions.thetas.thetas import Thetas
+
 class Sequence:
     def __init__(self, actionset: np.ndarray, length=1, d=1) -> None:
         self.actionset: np.ndarray = actionset
         self.m = np.max(np.linalg.norm(actionset, ord=1, axis=1))
 
-        self.theta = np.zeros((length, d, self.K))
+        self.thetas = np.zeros((length, d, self.K))
         self.contexts = np.zeros((length, d))
 
         self.loss_sequence_cache: np.ndarray    = None
@@ -29,7 +32,7 @@ class Sequence:
 
     @property
     def d(self) -> int:
-        return self.theta.shape[1]
+        return self.thetas.shape[1]
 
     @property
     def K(self) -> int:
@@ -37,11 +40,11 @@ class Sequence:
 
     @property
     def length(self) -> int:
-        return self.theta.shape[0]
+        return self.thetas.shape[0]
 
     @property
     def finished_generating(self) -> bool:
-        return self.length == self.current_index
+        return self.length == self.current_index        
 
     @property
     def loss_sequence(self) -> np.ndarray:
@@ -53,10 +56,20 @@ class Sequence:
         
         self.loss_sequence_cache = np.zeros((self.length, self.K))
         for i in range(self.length):
-            self.loss_sequence_cache[i] = self.contexts[i].T @ self.theta[i]
+            self.loss_sequence_cache[i] = self.contexts[i].T @ self.thetas[i]
 
         return self.loss_sequence_cache
         
+    def set_contexts(self, contexts: Context, rng: np.random.Generator):
+        self.contexts = contexts.generate(self.length, rng)
+
+        self.sigma = contexts.true_sigma
+        self.context_unbiased_estimator = contexts.unbiased_sample
+        self.lambda_min = contexts.lambda_min
+
+    def set_theta(self, theta: Thetas, rng: np.random.Generator):
+        self.thetas = theta.generate(self.length, rng)
+        self.R = theta.true_R
 
     def get_next(self, action: np.ndarray) -> Tuple[np.ndarray, np.float, np.bool]:
         """
@@ -70,7 +83,7 @@ class Sequence:
             self.current_index += 1
             return self.contexts[0], None, None, False
 
-        loss_vec = self.contexts[self.current_index].T @ self.theta[self.current_index]
+        loss_vec = self.contexts[self.current_index].T @ self.thetas[self.current_index]
         loss = loss_vec @ action
 
         self.current_index += 1
