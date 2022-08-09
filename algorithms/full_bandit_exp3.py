@@ -50,7 +50,6 @@ class FullBanditExp3(Algorithm):
         return (self.ellipsoid_center - point) @ self.ellipsoid_H @ (self.ellipsoid_center - point) - 1
 
     def find_johns(self, tolerance=1e-5):
-        tolerance = 1e-5
         self.ellipsoid_H, self.ellipsoid_center = mvee(self.actionset, tolerance)
 
         self.boundary_points = []
