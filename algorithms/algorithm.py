@@ -7,7 +7,8 @@ from distributions.sequence import Sequence
 
 class Algorithm(ABC):
     def __init__(self) -> None:
-        pass
+        self.theta_estimates = None
+        self.theta_position = 0
 
     @abstractmethod
     def get_policy(self, context: np.ndarray):

@@ -5,7 +5,8 @@ from algorithms.algorithm import Algorithm
 from distributions.sequence import Sequence
 from misc.matrix_geometric_resampling import matrix_geometric_resampling
 
-class SemiBanditExp3(Algorithm):
+
+class SemiBanditFTRL(Algorithm):
 
     def __init__(self) -> None:
         super().__init__()
@@ -15,11 +16,14 @@ class SemiBanditExp3(Algorithm):
         self.eta: float     = None
         self.M: float       = None
 
+    def regulariser(self, action: np.ndarray) -> float:
+        return 1/self.eta * np.sum(action * np.log(action) - action)
+
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
         self.mgr_rng = rng
 
         self.actionset = sequence.actionset
-        self.exploratory_set = np.arange(len(self.actionset))
+        self.exploratory_set = self.actionset.get_exploratory_set()
 
         self.theta_estimates: np.ndarray = np.zeros((sequence.length, sequence.d, sequence.K))
         self.theta_position = 0
@@ -28,36 +32,34 @@ class SemiBanditExp3(Algorithm):
 
         self.beta = 1/(2 * (sequence.sigma**2))
     
-        m = np.max(np.sum(self.actionset, axis=1))
-        max_term = np.max([m * sequence.K * sequence.d, len(self.exploratory_set) * m / (self.beta * sequence.lambda_min)])
+        m = self.actionset.m
+        one_plus_log = 1 + np.log(sequence.K / m)
+        max_term = np.max([sequence.K * sequence.d, len(self.exploratory_set) * m * sequence.sigma**2 * one_plus_log / (self.beta * sequence.lambda_min * np.log(2))])
         log_term = np.log(np.sqrt(sequence.length) * m * sequence.sigma * sequence.R)
-        log_A = np.log(len(self.actionset))
 
-        self.gamma = np.sqrt(max_term * log_A * log_term / sequence.length)
+        self.gamma = np.sqrt(max_term / (sequence.length * m * one_plus_log))
         if self.gamma > 1: raise Exception(f"gamma should be smaller than 1 but is {self.gamma}, for {sequence.name}")
-        self.eta = np.sqrt(log_A / (sequence.length * max_term * log_term))
+        self.eta = np.sqrt(m * one_plus_log / (sequence.length * max_term))
 
-        self.M = int(np.ceil(len(self.exploratory_set) * m / (self.beta * sequence.lambda_min) * log_term))
+        self.M = int(np.ceil(len(self.exploratory_set) * log_term / (self.gamma * self.beta * sequence.lambda_min)))
 
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
-        action_scores = np.einsum("a,bac,ec->e", context, self.theta_estimates[:self.theta_position], self.actionset)
-
-        action_scores = np.exp(-self.eta * action_scores)
-        action_scores /= np.sum(action_scores)
+        action_scores = self.actionset.ftrl_routine(context, self)
 
         exploration_bonus = np.zeros(len(action_scores))
         exploration_bonus[self.exploratory_set] += 1/len(self.exploratory_set)
 
         probabilities = (1 - self.gamma) * action_scores + self.gamma * exploration_bonus
         return probabilities
+
     
     def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray):
 
         def unbiased_estimator(k: int, rng: np.random.Generator) -> np.ndarray:
             context_sample = self.context_unbiased_estimator(rng)
             probabilities = self.get_policy(context_sample)
-            action_sample_index = rng.choice(np.arange(len(self.actionset)), p=probabilities)
+            action_sample_index = rng.choice(np.arange(len(self.actionset.actionset)), p=probabilities)
 
             return self.actionset[action_sample_index, k] * context_sample.reshape(-1, 1) @ context_sample.reshape(1, -1)
 

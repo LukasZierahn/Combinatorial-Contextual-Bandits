@@ -34,9 +34,6 @@ def mvee(points, tol=0.0001):
 class FullBanditExp3(Algorithm):
 
     def __init__(self) -> None:
-        self.theta_estimates = None
-        self.theta_position = 0
-
         self.beta = None
         self.gamma = None
         self.eta = None
@@ -104,7 +101,7 @@ class FullBanditExp3(Algorithm):
 
             return self.actionset[action_sample_index, k] * context_sample.reshape(-1, 1) @ context_sample.reshape(1, -1)
 
-        for i in range(self.actionset.shape[1]):
+        for i in range(self.actionset.K):
             inverse = matrix_geometric_resampling(self.mgr_rng, self.M, self.beta, partial(unbiased_estimator, i))
             self.theta_estimates[self.theta_position, :, i] = inverse @ context * loss_vec[i]
 

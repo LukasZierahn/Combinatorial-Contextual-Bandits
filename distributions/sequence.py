@@ -1,12 +1,13 @@
 from typing import Callable, Dict, Tuple
 import numpy as np
+from distributions.actionsets.actionset import Actionset
 
 from distributions.contexts.context import Context
 from distributions.thetas.thetas import Thetas
 
 class Sequence:
-    def __init__(self, actionset: np.ndarray, length=1, d=1) -> None:
-        self.actionset: np.ndarray = actionset
+    def __init__(self, actionset: Actionset, length=1, d=1) -> None:
+        self.actionset = actionset
         self.m = np.max(np.linalg.norm(actionset, ord=1, axis=1))
 
         self.thetas = np.zeros((length, d, self.K))
@@ -36,7 +37,7 @@ class Sequence:
 
     @property
     def K(self) -> int:
-        return self.actionset.shape[1]
+        return self.actionset.K
 
     @property
     def length(self) -> int:
@@ -111,7 +112,7 @@ class Sequence:
             sub_sequence = self.loss_sequence[unique_contexts_indices == context_id]
 
             loss_of_best_action = np.inf
-            for action in self.actionset:
+            for action in self.actionset.actionset:
                 loss_of_action = np.sum(sub_sequence @ action)
                 if loss_of_action < loss_of_best_action:
                     loss_of_best_action = loss_of_action
