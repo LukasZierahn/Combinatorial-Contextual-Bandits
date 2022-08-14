@@ -31,7 +31,7 @@ class Algorithm(ABC):
         losses = []
         while not done:
             probabilities = self.get_policy(context)
-            action_index = rng.choice(np.arange(len(sequence.actionset)), p=probabilities)
+            action_index = rng.choice(np.arange(sequence.actionset.number_of_actions), p=probabilities)
             context, loss, loss_vec, done = sequence.get_next(sequence.actionset[action_index])
             
             if not done:

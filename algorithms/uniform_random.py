@@ -8,7 +8,7 @@ class UniformRandom(Algorithm):
         self.actionset = sequence.actionset
 
     def get_policy(self, context: np.ndarray):
-        return np.ones(len(self.actionset)) / len(self.actionset)
+        return np.ones(self.actionset.number_of_actions) / self.actionset.number_of_actions
 
     def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray):
         pass

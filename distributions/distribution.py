@@ -1,11 +1,12 @@
 import numpy as np
+import distributions.actionsets.actionset
 from distributions.contexts.context import Context
 from distributions.thetas.thetas import Thetas
 
 from distributions.sequence import Sequence
 
 class Distribution():
-    def __init__(self, context: Context, thetas: Thetas, actionset: np.ndarray) -> None:
+    def __init__(self, context: Context, thetas: Thetas, actionset: distributions.actionsets.actionset.Actionset) -> None:
         self.context = context
         self.thetas = thetas
         self.actionset = actionset

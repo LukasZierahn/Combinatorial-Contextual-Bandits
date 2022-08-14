@@ -8,7 +8,7 @@ from distributions.thetas.thetas import Thetas
 class Sequence:
     def __init__(self, actionset: Actionset, length=1, d=1) -> None:
         self.actionset = actionset
-        self.m = np.max(np.linalg.norm(actionset, ord=1, axis=1))
+        self.m = actionset.m
 
         self.thetas = np.zeros((length, d, self.K))
         self.contexts = np.zeros((length, d))

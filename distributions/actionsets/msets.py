@@ -1,5 +1,4 @@
 import numpy as np
-from algorithms.semi_bandit_ftrl import SemiBanditFTRL
 from distributions.actionsets.actionset import Actionset
 from math import comb
 
