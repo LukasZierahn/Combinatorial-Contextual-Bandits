@@ -52,7 +52,7 @@ class SemiBanditExp3(Algorithm):
         probabilities = (1 - self.gamma) * action_scores + self.gamma * exploration_bonus
         return probabilities
     
-    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray):
+    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):
 
         def unbiased_estimator(k: int, rng: np.random.Generator) -> np.ndarray:
             context_sample = self.context_unbiased_estimator(rng)

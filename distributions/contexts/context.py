@@ -16,5 +16,5 @@ class Context(ABC):
 
     @abstractmethod
     def unbiased_sample(self, rng: np.random.Generator) -> np.ndarray:
-        raise NotImplementedError
+        raise NotImplementedError()
 

@@ -10,5 +10,5 @@ class UniformRandom(Algorithm):
     def get_policy(self, context: np.ndarray):
         return np.ones(self.actionset.number_of_actions) / self.actionset.number_of_actions
 
-    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray):
+    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action: np.ndarray):
         pass

@@ -1,27 +1,36 @@
 from abc import ABC, abstractmethod
 from typing import Tuple
 import numpy as np
+from distributions.actionsets.actionset import Actionset
 
 from distributions.sequence import Sequence
 
 
 class Algorithm(ABC):
     def __init__(self) -> None:
+        self.full_bandit = False
         self.theta_estimates = None
         self.theta_position = 0
+
+        self.d: int = None
+        self.K: int = None
+        self.length: int = None
+        self.actionset: Actionset = None
+
+    def set_constants(self, rng: np.random.Generator, sequence: Sequence):
+        self.d = sequence.d
+        self.K = sequence.K
+        self.length = sequence.length
+        self.actionset = sequence.actionset
 
     @abstractmethod
     def get_policy(self, context: np.ndarray):
         raise NotImplementedError
-
-    @abstractmethod
-    def set_constants(self, rng: np.random.Generator, sequence: Sequence):
+    
+    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):
         raise NotImplementedError
     
-    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray):
-        raise NotImplementedError
-    
-    def observe_loss(self, loss: np.float, context: np.ndarray):
+    def observe_loss(self, loss: float, context: np.ndarray, action_index: int):
         raise NotImplementedError
     
     def run_on_sequence(self, rng: np.random.Generator, sequence: Sequence) -> Tuple[float, np.ndarray]:
@@ -32,11 +41,14 @@ class Algorithm(ABC):
         while not done:
             probabilities = self.get_policy(context)
             action_index = rng.choice(np.arange(sequence.actionset.number_of_actions), p=probabilities)
-            context, loss, loss_vec, done = sequence.get_next(sequence.actionset[action_index])
-            
-            if not done:
-                self.observe_loss_vec(loss_vec, context)
+
+            next_context, loss, loss_vec, done = sequence.get_next(sequence.actionset[action_index])
+            if self.full_bandit:
+                self.observe_loss(loss, context, action_index)
+            else:
+                self.observe_loss_vec(loss_vec, context, action_index)
 
             losses.append(loss)
+            context = next_context
 
         return np.sum(losses), np.array(losses)
