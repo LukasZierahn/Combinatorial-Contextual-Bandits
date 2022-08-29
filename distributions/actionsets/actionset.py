@@ -58,11 +58,8 @@ class Actionset():
                 boundary_points.append(index)
         return np.array(boundary_points)
     
-    def ftrl_routine(self, context: np.ndarray, ftrl_algorithm):
-        def fun(mu):
-            action = np.sum(mu * self.actionset, axis=1)
-            action_score = np.einsum("a,bac,c", context, ftrl_algorithm.theta_estimates[:ftrl_algorithm.theta_position], self.actionset)
-            return action_score + ftrl_algorithm.regulariser(action)
+    def ftrl_routine(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
+        raise NotImplementedError()
 
 
     def __getitem__(self, key):

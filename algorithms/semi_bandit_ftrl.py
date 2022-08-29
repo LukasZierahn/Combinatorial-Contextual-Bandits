@@ -17,9 +17,10 @@ class SemiBanditFTRL(Algorithm):
         self.M: float       = None
 
     def regulariser(self, action: np.ndarray) -> float:
-        return 1/self.eta * np.sum(action * np.log(action) - action)
+        return 1/self.eta * np.sum(action * np.log(action + 1e-6) - action)
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
+        super().set_constants(rng, sequence)
         self.mgr_rng = rng
 
         self.actionset = sequence.actionset
@@ -45,16 +46,17 @@ class SemiBanditFTRL(Algorithm):
 
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
-        action_scores = self.actionset.ftrl_routine(context, self)
+        if self.theta_position == 0:
+            return np.ones(self.K) / self.K
 
-        exploration_bonus = np.zeros(len(action_scores))
-        exploration_bonus[self.exploratory_set] += 1/len(self.exploratory_set)
+        action_scores = self.actionset.ftrl_routine(context, self.mgr_rng, self)
+        exploration_bonus = self.actionset.get_exploratory_set()
 
         probabilities = (1 - self.gamma) * action_scores + self.gamma * exploration_bonus
         return probabilities
 
     
-    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray):
+    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):
 
         def unbiased_estimator(k: int, rng: np.random.Generator) -> np.ndarray:
             context_sample = self.context_unbiased_estimator(rng)

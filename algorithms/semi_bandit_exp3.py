@@ -16,6 +16,7 @@ class SemiBanditExp3(Algorithm):
         self.M: float       = None
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
+        super().set_constants(rng, sequence)
         self.mgr_rng = rng
 
         self.actionset = sequence.actionset

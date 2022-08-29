@@ -2,6 +2,8 @@ import numpy as np
 from distributions.actionsets.actionset import Actionset
 from math import comb
 
+from scipy.optimize import minimize
+
 def generate_mset(K: int, m: int) -> np.ndarray:
     if m == K:
         return np.ones((1, K), dtype=bool)
@@ -26,3 +28,28 @@ class MSets(Actionset):
             raise Exception(f"tried to call not get_johns on MSets when m = {self.m} which is not 1")
         
         return np.ones(self.K) / self.K
+
+    def ftrl_routine(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
+        actions = np.exp(-1 * ftrl_algorithm.eta * np.einsum("a,bac->c", context, ftrl_algorithm.theta_estimates[:ftrl_algorithm.theta_position]))
+        return actions / np.sum(actions)
+        
+
+    def ftrl_routine_slow(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
+        if self.m != 1:
+            raise Exception(f"tried to call not ftrl_routine on MSets when m = {self.m} which is not 1")
+
+        def fun(mu):
+            action_score = np.einsum("a,bac,c->", context, ftrl_algorithm.theta_estimates[:ftrl_algorithm.theta_position], mu)
+            return action_score + ftrl_algorithm.regulariser(mu)
+
+        bnds = []
+        for _ in range(self.K):
+            bnds.append((0, 1))
+
+        cons = {'type':'eq', 'fun': lambda x: np.sum(x) - 1}
+
+        x0 = rng.random(self.K)
+        x0 /= np.sum(x0)
+        sol = minimize(fun, x0=x0, bounds=bnds, constraints=cons)
+
+        return sol.x

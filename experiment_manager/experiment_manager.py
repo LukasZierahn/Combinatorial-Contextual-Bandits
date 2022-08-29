@@ -45,10 +45,9 @@ class ExperimentManager:
             for index, seq in enumerate(sequences.flatten()):
                 rng, seed_sequence = next_rng(seed_sequence)
                 results[alg_index][index] = single_run(rng, algorithm, seq)
-            
+        
 
-        seed_sequence = None
-        return results
+        return results.reshape((len(algorithms), len(distributions), len(lengths), iterations))
 
 
 
