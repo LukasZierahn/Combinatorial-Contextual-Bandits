@@ -47,12 +47,11 @@ class FullBanditExp3(Algorithm):
 
         action_scores = np.einsum("a,bac,ec->e", context, self.theta_estimates[:self.theta_position], self.actionset.actionset)
 
-        #min_score = np.min(action_scores)
-        min_score = 0
-        action_scores = np.exp(-self.eta * (action_scores - min_score))
-        action_scores /= np.sum(action_scores - min_score)
+        min_score = np.min(action_scores)
+        action_scores_exp = np.exp(-self.eta * (action_scores - min_score))
+        action_scores_exp /= np.sum(action_scores_exp)
 
-        probabilities = (1 - self.gamma) * action_scores + self.gamma * self.exploration_bonus
+        probabilities = (1 - self.gamma) * action_scores_exp + self.gamma * self.exploration_bonus
         return probabilities
     
     def observe_loss(self, loss: float, context: np.ndarray, action_index: int):

@@ -45,13 +45,13 @@ class SemiBanditExp3(Algorithm):
         action_scores = np.einsum("a,bac,ec->e", context, self.theta_estimates[:self.theta_position], self.actionset.actionset)
 
         min_score = np.min(action_scores)
-        action_scores = np.exp(-self.eta * (action_scores - min_score))
-        action_scores /= np.sum(action_scores - min_score)
+        action_scores_exp = np.exp(-self.eta * (action_scores - min_score))
+        action_scores_exp /= np.sum(action_scores_exp)
 
         exploration_bonus = np.zeros(len(action_scores))
         exploration_bonus[self.exploratory_set] += 1/len(self.exploratory_set)
 
-        probabilities = (1 - self.gamma) * action_scores + self.gamma * exploration_bonus
+        probabilities = (1 - self.gamma) * action_scores_exp + self.gamma * exploration_bonus
         return probabilities
     
     def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):
