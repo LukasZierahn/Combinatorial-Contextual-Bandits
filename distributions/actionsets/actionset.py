@@ -32,7 +32,7 @@ def distance_to_ellipsoid_boundary(ellipsoid_H, ellipsoid_center, point: np.ndar
 class Actionset():
     def __init__(self, actionset: np.ndarray) -> None:
         self.actionset = actionset
-        self.m: int = None
+        self.m: int = np.max(np.sum(self.actionset, axis=1))
 
     @property
     def K(self) -> int:

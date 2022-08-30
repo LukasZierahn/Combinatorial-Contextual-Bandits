@@ -24,10 +24,7 @@ class MSets(Actionset):
         self.m = m
 
     def get_johns(self):
-        if self.m != 1:
-            raise Exception(f"tried to call not get_johns on MSets when m = {self.m} which is not 1")
-        
-        return np.ones(self.K) / self.K
+        return np.ones(len(self.actionset)) / len(self.actionset)
 
     def ftrl_routine(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
         actions = np.exp(-1 * ftrl_algorithm.eta * np.einsum("a,bac->c", context, ftrl_algorithm.theta_estimates[:ftrl_algorithm.theta_position]))

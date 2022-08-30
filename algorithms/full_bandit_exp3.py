@@ -47,8 +47,10 @@ class FullBanditExp3(Algorithm):
 
         action_scores = np.einsum("a,bac,ec->e", context, self.theta_estimates[:self.theta_position], self.actionset.actionset)
 
-        action_scores = np.exp(-self.eta * action_scores)
-        action_scores /= np.sum(action_scores)
+        #min_score = np.min(action_scores)
+        min_score = 0
+        action_scores = np.exp(-self.eta * (action_scores - min_score))
+        action_scores /= np.sum(action_scores - min_score)
 
         probabilities = (1 - self.gamma) * action_scores + self.gamma * self.exploration_bonus
         return probabilities

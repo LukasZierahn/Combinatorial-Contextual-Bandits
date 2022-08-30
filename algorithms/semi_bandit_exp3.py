@@ -44,8 +44,9 @@ class SemiBanditExp3(Algorithm):
     def get_policy(self, context: np.ndarray) -> np.ndarray:
         action_scores = np.einsum("a,bac,ec->e", context, self.theta_estimates[:self.theta_position], self.actionset.actionset)
 
-        action_scores = np.exp(-self.eta * action_scores)
-        action_scores /= np.sum(action_scores)
+        min_score = np.min(action_scores)
+        action_scores = np.exp(-self.eta * (action_scores - min_score))
+        action_scores /= np.sum(action_scores - min_score)
 
         exploration_bonus = np.zeros(len(action_scores))
         exploration_bonus[self.exploratory_set] += 1/len(self.exploratory_set)

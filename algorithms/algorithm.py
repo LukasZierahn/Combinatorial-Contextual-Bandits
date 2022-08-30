@@ -38,10 +38,14 @@ class Algorithm(ABC):
         context, _, _, done = sequence.get_next(None)
 
         losses = []
+        probability_array = []
+        action_array = []
         while not done:
             probabilities = self.get_policy(context)
+            probability_array.append(probabilities)
 
             action_index = rng.choice(np.arange(sequence.actionset.number_of_actions), p=probabilities)
+            action_array.append(action_index)
 
             next_context, loss, loss_vec, done = sequence.get_next(sequence.actionset[action_index])
             if self.full_bandit:
@@ -52,4 +56,4 @@ class Algorithm(ABC):
             losses.append(loss)
             context = next_context
 
-        return np.sum(losses), np.array(losses)
+        return np.sum(losses), np.array(losses), probability_array, action_array
