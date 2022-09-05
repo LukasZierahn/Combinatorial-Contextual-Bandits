@@ -20,16 +20,18 @@ def single_run_helper(args):
     return single_run(*args)
 
 def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequence, output_dir: str="") -> float:
+    algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
     print(f"Starting {output_dir}/{algo_name}")
     start = time.time()
+
     algorithm.set_constants(rng, sequence)
     loss, losses, probability_array, action_array = algorithm.run_on_sequence(rng, sequence)
     end = time.time()
-    loss_of_optimal_policy, _, _ = sequence.find_optimal_policy()
     print(f"Finishing {output_dir}/{algo_name} {end - start}")
+    
+    loss_of_optimal_policy, _, _ = sequence.find_optimal_policy()
 
     if output_dir != "":
-        algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
         np.savetxt(f"{output_dir}/{algo_name}_losses.csv", losses) 
         np.savetxt(f"{output_dir}/{algo_name}_probability_array.csv", probability_array) 
         np.savetxt(f"{output_dir}/{algo_name}_action_array.csv", action_array)
