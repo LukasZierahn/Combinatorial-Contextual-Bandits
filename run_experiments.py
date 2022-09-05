@@ -9,6 +9,7 @@ from algorithms.full_bandit_exp3 import FullBanditExp3
 from algorithms.semi_bandit_ftrl import SemiBanditFTRL
 from algorithms.uniform_random import UniformRandom
 from algorithms.non_contextual_exp3 import NonContextualExp3
+from algorithms.one_per_context import OnePerContext
 
 from experiment_manager.experiment_manager import ExperimentManager
 
@@ -22,7 +23,7 @@ import multiprocessing as mp
 
 if __name__ == "__main__":
     exp_manager = ExperimentManager()
-    algos = [FullBanditExp3(), NonContextualExp3(), UniformRandom()]
+    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), FullBanditExp3()]
 
     length = 10000
     d = 5
