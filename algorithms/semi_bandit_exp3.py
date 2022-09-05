@@ -10,11 +10,6 @@ class SemiBanditExp3(Algorithm):
     def __init__(self) -> None:
         super().__init__()
 
-        self.beta: float    = None
-        self.gamma: float   = None
-        self.eta: float     = None
-        self.M: float       = None
-
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
         super().set_constants(rng, sequence)
         self.mgr_rng = rng

@@ -26,6 +26,21 @@ class MSets(Actionset):
     def get_johns(self):
         return np.ones(len(self.actionset)) / len(self.actionset)
 
+    def get_exploratory_set(self):
+        buffer = []
+        for i in range(1 + self.K // self.m):
+            if i == self.K // self.m and self.K / self.m == self.K // self.m:
+                continue
+
+            next_vec = np.zeros(self.K, dtype=bool)
+            next_vec[i * self.m : np.min([(i + 1) * self.m, self.K])] = True
+            next_vec[ : np.max([(i + 1) * self.m - self.K, 0])] = True
+
+            index = (np.all(self.actionset == next_vec, axis=1)).nonzero()[0][0]
+            buffer.append(index)
+
+        return np.array(buffer)
+
     def ftrl_routine(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
         actions = np.exp(-1 * ftrl_algorithm.eta * np.einsum("a,bac->c", context, ftrl_algorithm.theta_estimates[:ftrl_algorithm.theta_position]))
         return actions / np.sum(actions)

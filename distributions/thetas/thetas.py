@@ -9,6 +9,10 @@ class Thetas(ABC):
         self.d: int = d
         self.true_R = true_R
 
+    @property
+    def name(self) -> str:
+        return f"Thetas{self.K/self.d}"
+
     @abstractmethod
     def generate(self, length: int, rng: np.random.Generator) -> np.ndarray:
         raise NotImplementedError

@@ -10,6 +10,10 @@ class Distribution():
         self.context = context
         self.thetas = thetas
         self.actionset = actionset
+        
+    @property
+    def name(self) -> str:
+        return f"{self.context.name}_{self.thetas.name}"
 
     def generate(self, length: int, context_rng: np.random.Generator, theta_rng: np.random.Generator) -> Sequence:
         seq = Sequence(self.actionset, length, self.context.d)

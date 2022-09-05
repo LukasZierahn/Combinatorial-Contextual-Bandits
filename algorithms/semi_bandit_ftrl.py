@@ -10,12 +10,7 @@ class SemiBanditFTRL(Algorithm):
 
     def __init__(self) -> None:
         super().__init__()
-
-        self.beta: float    = None
-        self.gamma: float   = None
-        self.eta: float     = None
-        self.M: float       = None
-
+        
     def regulariser(self, action: np.ndarray) -> float:
         return 1/self.eta * np.sum(action * np.log(action + 1e-6) - action)
 

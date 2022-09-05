@@ -17,11 +17,18 @@ class Algorithm(ABC):
         self.length: int = None
         self.actionset: Actionset = None
 
+        self.beta: float    = None
+        self.gamma: float   = None
+        self.eta: float     = None
+        self.M: float       = None
+
+
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
         self.d = sequence.d
         self.K = sequence.K
         self.length = sequence.length
         self.actionset = sequence.actionset
+        self.sequence = sequence
 
     @abstractmethod
     def get_policy(self, context: np.ndarray):

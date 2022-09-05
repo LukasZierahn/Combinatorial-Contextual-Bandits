@@ -8,12 +8,7 @@ from misc.matrix_geometric_resampling import matrix_geometric_resampling
 class FullBanditExp3(Algorithm):
 
     def __init__(self) -> None:
-        self.beta = None
-        self.gamma = None
-        self.eta = None
-
         self.exploration_bonus: np.ndarray = None
-
         self.full_bandit = True
     
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):

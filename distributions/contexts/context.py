@@ -8,6 +8,10 @@ class Context(ABC):
         self.d: int = d
         self.lambda_min: float = lambda_min
 
+    @property
+    def name(self) -> str:
+        return "Context"
+
     def generate(self, length: int, rng: np.random.Generator) -> np.ndarray:
         result = np.zeros((length, self.d))
         for i in range(length):

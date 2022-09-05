@@ -7,6 +7,9 @@ from distributions.distribution import Distribution
 from algorithms.algorithm import Algorithm
 from distributions.sequence import Sequence
 
+import time
+import pickle
+import json
 import re
 
 def next_rng(seed_sequence: np.random.SeedSequence):
@@ -17,18 +20,30 @@ def single_run_helper(args):
     return single_run(*args)
 
 def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequence, output_dir: str="") -> float:
+    start = time.time()
     algorithm.set_constants(rng, sequence)
     loss, losses, probability_array, action_array = algorithm.run_on_sequence(rng, sequence)
+    end = time.time()
     loss_of_optimal_policy, _, _ = sequence.find_optimal_policy()
 
     if output_dir != "":
-        with open(f"{output_dir}/sequence.json", "wb") as output_file:
-            import pickle
-            pickle.dump(sequence, output_file)
+        algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
+        np.savetxt(f"{output_dir}/{algo_name}_losses.csv", losses) 
+        np.savetxt(f"{output_dir}/{algo_name}_probability_array.csv", probability_array) 
+        np.savetxt(f"{output_dir}/{algo_name}_action_array.csv", action_array)
 
-        np.savetxt(f"{output_dir}/losses.csv", losses) 
-        np.savetxt(f"{output_dir}/probability_array.csv", probability_array) 
-        np.savetxt(f"{output_dir}/action_array.csv", action_array) 
+        general_info = {
+            "regret": loss - loss_of_optimal_policy,
+            "time_elapsed": end - start,
+            "gamma": algorithm.gamma,
+            "eta": algorithm.eta,
+            "beta": algorithm.beta,
+            "M": algorithm.M,
+            "is_full_bandit": algorithm.full_bandit
+        }
+        with open(f"{output_dir}/{algo_name}_general_info.json", "w") as output_file:
+            json.dump(general_info, output_file)
+        
 
     return loss - loss_of_optimal_policy
 
@@ -50,24 +65,33 @@ class ExperimentManager:
         
         
     def run(self, iterations: int, lengths: List[int], algorithms: List[Algorithm], distributions: List[Distribution], number_of_processes: int=1, seed: int=0) -> np.ndarray:
-        if "output" in os.listdir():
-            shutil.rmtree("output")
-        os.mkdir("output")
-
         seed_sequence = np.random.SeedSequence(seed)
 
         sequences = self.generate_sequences(seed_sequence.spawn(1)[0], iterations, lengths, distributions)
         results = np.zeros((len(algorithms), len(distributions), len(lengths), iterations), dtype=float).reshape(len(algorithms), -1)
 
-        args = []
-        for alg_index, algorithm in enumerate(algorithms):
-            for index, seq in enumerate(sequences.flatten()):
-                rng, seed_sequence = next_rng(seed_sequence)
+        if "output" in os.listdir():
+            shutil.rmtree("output")
+        os.mkdir("output")
+        
 
-                algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
-                output_dir = f"output/{algo_name}_{seq.length}_{index}"
-                os.mkdir(output_dir)
-                args.append((rng, algorithm, seq, output_dir))
+        args = []
+        for dist_index, dist in enumerate(distributions):
+            os.mkdir(f"output/{dist.name}")
+
+            for length_index, length in enumerate(lengths):
+                os.mkdir(f"output/{dist.name}/{length}")
+
+                for iteration in range(iterations):
+                    os.mkdir(f"output/{dist.name}/{length}/{iteration}")
+                    with open(f"output/{dist.name}/{length}/{iteration}/sequence.json", "wb") as output_file:
+                        pickle.dump(sequences[dist_index, length_index, iteration], output_file)
+
+                    for alg_index, algorithm in enumerate(algorithms):
+                        rng, seed_sequence = next_rng(seed_sequence)
+
+                        output_dir = f"output/{dist.name}/{length}/{iteration}"
+                        args.append((rng, algorithm, sequences[dist_index, length_index, iteration], output_dir))
         
         result_list = []
         if number_of_processes == 1:
