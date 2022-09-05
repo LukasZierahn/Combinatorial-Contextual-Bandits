@@ -4,7 +4,7 @@ import numpy as np
 from algorithms.algorithm import Algorithm
 from distributions.sequence import Sequence
 
-from non_contextual_exp3 import NonContextualExp3
+from algorithms.non_contextual_exp3 import NonContextualExp3
 
 class OnePerContext(Algorithm):
 
