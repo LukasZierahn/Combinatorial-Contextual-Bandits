@@ -14,7 +14,6 @@ class NonContextualExp3(Algorithm):
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
         super().set_constants(rng, sequence)
-        self.mgr_rng = rng
 
         self.actionset = sequence.actionset
         self.theta_estimates: np.ndarray = np.zeros((sequence.length, sequence.K))

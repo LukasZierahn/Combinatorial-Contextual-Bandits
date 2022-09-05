@@ -45,6 +45,6 @@ if __name__ == "__main__":
 
     dist_lower_bound = Distribution(BinaryContext(d), IndependentBernoulli(d, K, p), actionset)
 
-    lenghts = [1000, 2000, 5000, 10000]
+    lenghts = [10000]
     # data = exp_manager.run(10, lenghts, algos, [dist_lower_bound], 1)
     data = exp_manager.run(10, lenghts, algos, [dist_lower_bound], mp.cpu_count())

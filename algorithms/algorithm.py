@@ -24,6 +24,7 @@ class Algorithm(ABC):
 
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
+        self.rng = rng
         self.d = sequence.d
         self.K = sequence.K
         self.length = sequence.length

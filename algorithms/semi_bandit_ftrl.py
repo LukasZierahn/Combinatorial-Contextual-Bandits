@@ -16,7 +16,6 @@ class SemiBanditFTRL(Algorithm):
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
         super().set_constants(rng, sequence)
-        self.mgr_rng = rng
 
         self.actionset = sequence.actionset
         self.exploratory_set = self.actionset.get_exploratory_set()
@@ -61,7 +60,7 @@ class SemiBanditFTRL(Algorithm):
             return self.actionset[action_sample_index, k] * context_sample.reshape(-1, 1) @ context_sample.reshape(1, -1)
 
         for i in range(self.actionset.K):
-            inverse = matrix_geometric_resampling(self.mgr_rng, self.M, self.beta, partial(unbiased_estimator, i))
+            inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, partial(unbiased_estimator, i))
             self.theta_estimates[self.theta_position, :, i] = inverse @ context * loss_vec[i]
 
         self.theta_position += 1 

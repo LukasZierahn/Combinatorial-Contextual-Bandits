@@ -13,7 +13,6 @@ class FullBanditExp3(Algorithm):
     
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
         super().set_constants(rng, sequence)
-        self.mgr_rng = rng
 
         self.exploration_bonus = self.actionset.get_johns()
 
@@ -30,7 +29,7 @@ class FullBanditExp3(Algorithm):
         log_A = np.log(self.actionset.number_of_actions)
 
         self.gamma = np.sqrt(log_A * max_term * log_A * log_term / sequence.length)
-        assert self.gamma < 1, f"gamma should be smaller than 1 but is {self.gamma}, for {sequence.name}"
+        assert self.gamma < 1, f"FullBanditExp3 gamma should be smaller than 1 but is {self.gamma}, for {sequence.name}"
         self.eta = np.sqrt(log_A) / (m * np.sqrt(sequence.length * max_term * log_term))
 
         self.M = int(np.ceil(sequence.K / (2 * self.beta * self.gamma * sequence.lambda_min) * log_term))
@@ -60,7 +59,7 @@ class FullBanditExp3(Algorithm):
             output_matrix_length = len(context_sample) * len(self.actionset[action_sample_index])
             return tensor.reshape(output_matrix_length, output_matrix_length)
 
-        inverse = matrix_geometric_resampling(self.mgr_rng, self.M, self.beta, unbiased_estimator)
+        inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, unbiased_estimator)
         inverse_tensor = inverse.reshape((self.d, self.d, self.K, self.K))
 
         self.theta_estimates[self.theta_position] = loss * np.einsum("abcd,b,c", inverse_tensor, context, self.actionset[action_index])
