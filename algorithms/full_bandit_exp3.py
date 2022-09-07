@@ -52,12 +52,15 @@ class FullBanditExp3(Algorithm):
 
         def unbiased_estimator(rng: np.random.Generator) -> np.ndarray:
             context_sample = self.context_unbiased_estimator(rng)
+
             probabilities = self.get_policy(context_sample)
             action_sample_index = rng.choice(np.arange(self.actionset.number_of_actions), p=probabilities)
+            action = np.array(self.actionset[action_sample_index], dtype=float)
 
-            tensor = np.einsum("a,b,c,d->abcd", context_sample, context_sample,  self.actionset[action_sample_index],  self.actionset[action_sample_index])
-            output_matrix_length = len(context_sample) * len(self.actionset[action_sample_index])
-            return tensor.reshape(output_matrix_length, output_matrix_length)
+            d, K = len(context_sample), len(action)
+
+            tensor = np.einsum("a,b,c,d->cadb", context_sample, context_sample, action,  action)
+            return tensor.reshape(d * K, d * K)
 
         inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, unbiased_estimator)
         inverse_tensor = inverse.reshape((self.d, self.d, self.K, self.K))
