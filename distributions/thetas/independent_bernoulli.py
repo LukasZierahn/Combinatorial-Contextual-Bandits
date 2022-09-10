@@ -5,11 +5,11 @@ from distributions.thetas.thetas import Thetas
 
 
 class IndependentBernoulli(Thetas):
-    def __init__(self, K: int, d: int, p: np.ndarray=None) -> None:
+    def __init__(self, d: int, K: int, p: np.ndarray=None) -> None:
         """
         p at i, j is chance of having a loss of 1 at i, j
         """
-        super().__init__(K, d, d)
+        super().__init__(d, K, d)
         self.p = p
         if isinstance(p, list):
             self.p = np.array(p)

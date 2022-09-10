@@ -11,6 +11,8 @@ def matrix_geometric_resampling(rng: np.random.Generator, M: int, beta: float, u
     A[0] = np.identity(size) - beta * estimate
 
     for i in range(1, M):
+        if np.max(A[i - 1]) < 1e-5:
+            break
         A[i] = A[i - 1] @ (np.identity(size) - beta * unbiased_estimator(rng))
 
     return beta * np.identity(size) + beta * np.sum(A, axis=0)
