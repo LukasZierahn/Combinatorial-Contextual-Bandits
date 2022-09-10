@@ -19,7 +19,7 @@ class IndependentBernoulli(Thetas):
         
     @property
     def name(self) -> str:
-        return f"IndependentBernoulli{self.K/self.d}"
+        return f"IndependentBernoulli{self.K};{self.d}"
 
     def generate(self, length: int, rng: np.random.Generator) -> np.ndarray:
         randoms = rng.random(size=(length, self.d, self.K))

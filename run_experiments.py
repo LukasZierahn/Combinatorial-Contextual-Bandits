@@ -28,8 +28,8 @@ if __name__ == "__main__":
     lenghts = [10000]
 
     distributions = []
+    K = 5
     for d in [3, 5, 12]:
-        for K in [5, 8, 12]:
 
             actionset = MSets(K, 3)
 
@@ -47,6 +47,24 @@ if __name__ == "__main__":
             # p[1, 0] = 0.9
 
             distributions.append(Distribution(BinaryContext(d), IndependentBernoulli(d, K, p), actionset))
+    d = 5
+    for K in [5, 8, 12]:
+            actionset = MSets(K, 3)
 
+            # dist_holes = Distribution(BinaryContext(d), SingleHole(K, d, np.array([0.7, 0.3])), actionset)
+
+            epsilon = 0.25 * np.min([np.sqrt(K / lenghts[-1]), 1])
+            epsilon = 0.02
+            print("epsilon: ", epsilon)
+            p = np.zeros((d, K)) + 0.5
+            for i in range(d):
+                p[i, 0] -= epsilon
+
+            # p = np.zeros((d, K)) + 0.1
+            # p[0, 0] = 0.9
+            # p[1, 0] = 0.9
+
+            distributions.append(Distribution(BinaryContext(d), IndependentBernoulli(d, K, p), actionset))
+            
     # data = exp_manager.run(10, lenghts, algos, [dist_lower_bound], 1)
     data = exp_manager.run(10, lenghts, algos, distributions, mp.cpu_count())

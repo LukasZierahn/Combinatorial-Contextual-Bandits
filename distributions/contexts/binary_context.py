@@ -8,7 +8,7 @@ class BinaryContext(Context):
 
     @property
     def name(self) -> str:
-        return f"BinaryContext{self.number_of_ones/self.d}"
+        return f"BinaryContext{self.number_of_ones};{self.d}"
 
     def unbiased_sample(self, rng: np.random.Generator) -> np.ndarray:
         result = np.zeros(self.d)
