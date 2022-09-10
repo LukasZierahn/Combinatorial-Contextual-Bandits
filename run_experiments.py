@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
             distributions.append(Distribution(BinaryContext(d), IndependentBernoulli(d, K, p), actionset))
     d = 5
-    for K in [5, 8, 12]:
+    for K in [8, 12]:
             actionset = MSets(K, 3)
 
             # dist_holes = Distribution(BinaryContext(d), SingleHole(K, d, np.array([0.7, 0.3])), actionset)
