@@ -23,28 +23,30 @@ import multiprocessing as mp
 
 if __name__ == "__main__":
     exp_manager = ExperimentManager()
-    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), FullBanditExp3()]
-
-    length = 10000
-    d = 5
-    K = 5
-    actionset = MSets(K, 3)
-
-    # dist_holes = Distribution(BinaryContext(d), SingleHole(K, d, np.array([0.7, 0.3])), actionset)
-
-    epsilon = 0.25 * np.min([np.sqrt(K / length), 1])
-    epsilon = 0.02
-    print("epsilon: ", epsilon)
-    p = np.zeros((d, K)) + 0.5
-    for i in range(d):
-        p[i, 0] -= epsilon
-
-    # p = np.zeros((d, K)) + 0.1
-    # p[0, 0] = 0.9
-    # p[1, 0] = 0.9
-
-    dist_lower_bound = Distribution(BinaryContext(d), IndependentBernoulli(d, K, p), actionset)
+    algos = [UniformRandom(), OnePerContext(), NonContextualExp3()]
 
     lenghts = [10000]
+
+    distributions = []
+    for d in [3, 5, 12]:
+        for K in [5, 8, 12]:
+
+            actionset = MSets(K, 3)
+
+            # dist_holes = Distribution(BinaryContext(d), SingleHole(K, d, np.array([0.7, 0.3])), actionset)
+
+            epsilon = 0.25 * np.min([np.sqrt(K / lenghts[-1]), 1])
+            epsilon = 0.02
+            print("epsilon: ", epsilon)
+            p = np.zeros((d, K)) + 0.5
+            for i in range(d):
+                p[i, 0] -= epsilon
+
+            # p = np.zeros((d, K)) + 0.1
+            # p[0, 0] = 0.9
+            # p[1, 0] = 0.9
+
+            distributions.append(Distribution(BinaryContext(d), IndependentBernoulli(d, K, p), actionset))
+
     # data = exp_manager.run(10, lenghts, algos, [dist_lower_bound], 1)
-    data = exp_manager.run(10, lenghts, algos, [dist_lower_bound], mp.cpu_count())
+    data = exp_manager.run(10, lenghts, algos, distributions, mp.cpu_count())
