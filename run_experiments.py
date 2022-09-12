@@ -66,5 +66,5 @@ if __name__ == "__main__":
 
             distributions.append(Distribution(BinaryContext(d), IndependentBernoulli(d, K, p), actionset))
             
-    # data = exp_manager.run(10, lenghts, algos, [dist_lower_bound], 1)
-    data = exp_manager.run(10, lenghts, algos, distributions, mp.cpu_count())
+    data = exp_manager.run(10, lenghts, algos, distributions, 1)
+    # data = exp_manager.run(10, lenghts, algos, distributions, mp.cpu_count())
