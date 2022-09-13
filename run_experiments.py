@@ -58,5 +58,5 @@ if __name__ == "__main__":
         "M": 1,
         "M": 10
     }]
-    data = exp_manager.run(1, lenghts, algos, distributions, override_constants, 1)
-    # data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
+    # data = exp_manager.run(1, lenghts, algos, distributions, override_constants, 1)
+    data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
