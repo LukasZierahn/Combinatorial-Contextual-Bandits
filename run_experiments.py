@@ -58,6 +58,9 @@ if __name__ == "__main__":
         "M": 10
     },
     {
+        "M": 25
+    },
+    {
         "M": 1
     }]
     # data = exp_manager.run(1, lenghts, algos, distributions, override_constants, 1)
