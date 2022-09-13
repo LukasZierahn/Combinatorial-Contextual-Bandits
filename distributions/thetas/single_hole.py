@@ -15,9 +15,7 @@ class SingleHole(Thetas):
             self.p = np.ones(K)/K
         
 
-    @property
-    def name(self) -> str:
-        return f"SingleHole{self.K/self.d}"
+        self.name = f"SingleHole{self.d};{self.K}"
 
     def generate(self, length: int, rng: np.random.Generator) -> np.ndarray:
         thetas = np.ones((length, self.d, self.K))

@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 from distributions.distribution import Distribution
@@ -8,6 +8,7 @@ from algorithms.algorithm import Algorithm
 from distributions.sequence import Sequence
 
 import time
+import datetime
 import pickle
 import json
 import re
@@ -19,12 +20,16 @@ def next_rng(seed_sequence: np.random.SeedSequence):
 def single_run_helper(args):
     return single_run(*args)
 
-def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequence, output_dir: str="") -> float:
+def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequence, override_constants: Dict[str, float], output_dir: str="") -> float:
     algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
-    print(f"Starting {output_dir}/{algo_name}")
+    print(f"Starting {output_dir}/{algo_name} {datetime.datetime.now()}")
     start = time.time()
 
     algorithm.set_constants(rng, sequence)
+    for key, value in override_constants.items():
+        setattr(algorithm, key, value)
+        algo_name += f"{key}={value}"
+
     loss, losses, probability_array, action_array = algorithm.run_on_sequence(rng, sequence)
     end = time.time()
     print(f"Finishing {output_dir}/{algo_name} {end - start}")
@@ -68,7 +73,7 @@ class ExperimentManager:
         return sequences
         
         
-    def run(self, iterations: int, lengths: List[int], algorithms: List[Algorithm], distributions: List[Distribution], number_of_processes: int=1, seed: int=0) -> np.ndarray:
+    def run(self, iterations: int, lengths: List[int], algorithms: List[Algorithm], distributions: List[Distribution], override_constants: List[Dict[str, float]] = [{}], number_of_processes: int=1, seed: int=0) -> np.ndarray:
         seed_sequence = np.random.SeedSequence(seed)
 
         sequences = self.generate_sequences(seed_sequence.spawn(1)[0], iterations, lengths, distributions)
@@ -92,10 +97,11 @@ class ExperimentManager:
                         pickle.dump(sequences[dist_index, length_index, iteration], output_file)
 
                     for alg_index, algorithm in enumerate(algorithms):
-                        rng, seed_sequence = next_rng(seed_sequence)
+                        for override_constant in override_constants:
+                            rng, seed_sequence = next_rng(seed_sequence)
 
-                        output_dir = f"output/{dist.name}/{length}/{iteration}"
-                        args.append((rng, algorithm, sequences[dist_index, length_index, iteration], output_dir))
+                            output_dir = f"output/{dist.name}/{length}/{iteration}"
+                            args.append((rng, algorithm, sequences[dist_index, length_index, iteration], override_constant, output_dir))
         
         result_list = []
         if number_of_processes == 1:

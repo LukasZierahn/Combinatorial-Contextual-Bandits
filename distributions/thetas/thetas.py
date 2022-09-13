@@ -9,9 +9,7 @@ class Thetas(ABC):
         self.K: int = K
         self.true_R = true_R
 
-    @property
-    def name(self) -> str:
-        return f"Thetas{self.d}/{self.K}"
+        self.name = f"Thetas{self.d}/{self.K}"
 
     @abstractmethod
     def generate(self, length: int, rng: np.random.Generator) -> np.ndarray:

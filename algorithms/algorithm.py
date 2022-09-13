@@ -56,6 +56,7 @@ class Algorithm(ABC):
             action_array.append(action_index)
 
             next_context, loss, loss_vec, done = sequence.get_next(sequence.actionset[action_index])
+            loss_vec[~sequence.actionset[action_index]] = 0
             if self.full_bandit:
                 self.observe_loss(loss, context, action_index)
             else:

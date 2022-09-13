@@ -53,6 +53,10 @@ if __name__ == "__main__":
     for K in [5, 8]:
             actionset = MSets(K, m)
             distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
-            
-    # data = exp_manager.run(10, lenghts, algos, distributions, 1)
-    data = exp_manager.run(16, lenghts, algos, distributions, mp.cpu_count())
+
+    override_constants = [{
+        "M": 1,
+        "M": 10
+    }]
+    data = exp_manager.run(1, lenghts, algos, distributions, override_constants, 1)
+    # data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
