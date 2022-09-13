@@ -1,6 +1,7 @@
+from genericpath import isfile
 import os
 import shutil
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import numpy as np
 from distributions.distribution import Distribution
@@ -20,26 +21,27 @@ def next_rng(seed_sequence: np.random.SeedSequence):
 def single_run_helper(args):
     return single_run(*args)
 
-def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequence, override_constants: Dict[str, float], output_dir: str="") -> float:
-    algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
-    print(f"Starting {output_dir}/{algo_name} {datetime.datetime.now()}")
-    start = time.time()
-
+def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequence, override_constant: Dict[str, float], output_dir: str="") -> float:
     algorithm.set_constants(rng, sequence)
-    for key, value in override_constants.items():
+    for key, value in override_constant.items():
         setattr(algorithm, key, value)
-        algo_name += f"{key}={value}"
+
+    if os.path.isfile(f"{output_dir}_general_info.json"):
+        return 0
+
+    print(f"Starting {output_dir} {datetime.datetime.now()}")
+    start = time.time()
 
     loss, losses, probability_array, action_array = algorithm.run_on_sequence(rng, sequence)
     end = time.time()
-    print(f"Finishing {output_dir}/{algo_name} {end - start}")
+    print(f"Finishing {output_dir} {end - start}")
     
     loss_of_optimal_policy, _, _ = sequence.find_optimal_policy()
 
     if output_dir != "":
-        np.savetxt(f"{output_dir}/{algo_name}_losses.csv", losses) 
-        np.savetxt(f"{output_dir}/{algo_name}_probability_array.csv", probability_array) 
-        np.savetxt(f"{output_dir}/{algo_name}_action_array.csv", action_array)
+        np.savetxt(f"{output_dir}_losses.csv", losses) 
+        np.savetxt(f"{output_dir}_probability_array.csv", probability_array) 
+        np.savetxt(f"{output_dir}_action_array.csv", action_array)
 
         general_info = {
             "regret": loss - loss_of_optimal_policy,
@@ -50,11 +52,9 @@ def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequenc
             "M": algorithm.M,
             "is_full_bandit": algorithm.full_bandit
         }
-        with open(f"{output_dir}/{algo_name}_general_info.json", "w") as output_file:
+        with open(f"{output_dir}_general_info.json", "w") as output_file:
             json.dump(general_info, output_file)
         
-
-    return loss - loss_of_optimal_policy
 
 def single_run_helper(args) -> float:
     return single_run(*args)
@@ -63,6 +63,40 @@ class ExperimentManager:
     def __init__(self) -> None:
         self.seed_sequence = None
 
+    def run_on_existing(self, algorithms: List[Algorithm], override_constants: List[Dict[str, float]] = [{}], number_of_processes: int=1, seed: int=0) -> np.ndarray:
+        seed_sequence = np.random.SeedSequence(seed)
+        
+        args = []
+        distributions = os.listdir(f"output/")
+        for dist_index, dist in enumerate(distributions):
+            lengths = os.listdir(f"output/{dist}")
+
+            for length_index, length in enumerate(lengths):
+                iterations = os.listdir(f"output/{dist}/{length}")
+
+                for iteration in iterations:
+                    
+                    for alg_index, algorithm in enumerate(algorithms):
+                        for override_constant in override_constants:
+
+                            algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
+                            for key, value in override_constant.items():
+                                algo_name += f"{key}={value}"
+
+                            if os.path.isfile(f"output/{dist}/{length}/{iteration}/{algo_name}_general_info.json"):
+                                continue
+
+
+                            with open(f"output/{dist}/{length}/{iteration}/sequence.json", "rb") as input_file:
+                                sequence = pickle.load(input_file)
+
+                                rng, seed_sequence = next_rng(seed_sequence)
+
+                                output_dir = f"output/{dist}/{length}/{iteration}/{algo_name}"
+                                args.append((rng, algorithm, sequence, override_constant, output_dir))
+
+        self.run_args(args, number_of_processes)
+                        
     def generate_sequences(self, seed_sequence: np.random.SeedSequence, iterations: int, lengths: List[int], distributions: List[Distribution]) -> np.ndarray:
         sequences = np.zeros((len(distributions), len(lengths), iterations), dtype=object)
         for dist_index, dist in enumerate(distributions):
@@ -71,13 +105,12 @@ class ExperimentManager:
                     context_seed, theta_seed, seed_sequence = seed_sequence.spawn(3)
                     sequences[dist_index, length_index, iteration] = dist.generate(length, np.random.default_rng(context_seed), np.random.default_rng(theta_seed))
         return sequences
-        
-        
-    def run(self, iterations: int, lengths: List[int], algorithms: List[Algorithm], distributions: List[Distribution], override_constants: List[Dict[str, float]] = [{}], number_of_processes: int=1, seed: int=0) -> np.ndarray:
-        seed_sequence = np.random.SeedSequence(seed)
+    
 
+    def run(self, iterations: int, lengths: List[int], algorithms: List[Algorithm], distributions: List[Distribution], override_constants: List[Dict[str, float]] = [{}], number_of_processes: int=1, seed: int=0) -> np.ndarray:
+
+        seed_sequence = np.random.SeedSequence(seed)
         sequences = self.generate_sequences(seed_sequence.spawn(1)[0], iterations, lengths, distributions)
-        results = np.zeros((len(algorithms), len(distributions), len(lengths), iterations), dtype=float).reshape(len(algorithms), -1)
 
         if "output" in os.listdir():
             shutil.rmtree("output")
@@ -103,21 +136,14 @@ class ExperimentManager:
                             output_dir = f"output/{dist.name}/{length}/{iteration}"
                             args.append((rng, algorithm, sequences[dist_index, length_index, iteration], override_constant, output_dir))
         
-        result_list = []
+        self.run_args(args, number_of_processes)
+
+    def run_args(self, args, number_of_processes: int):
+        print("Starting", len(args), "runs")
         if number_of_processes == 1:
             for arg in args:
-                result_list.append(single_run_helper(arg))
+                single_run_helper(arg)
         else:
             import multiprocessing as mp
             with mp.Pool(number_of_processes) as pool:
-                result_list = pool.map(single_run_helper, args)
-
-        for alg_index, algorithm in enumerate(algorithms):
-            for index, seq in enumerate(sequences.flatten()):
-                results[alg_index][index] = result_list[alg_index * len(sequences) + index]
-        
-
-        return results.reshape((len(algorithms), len(distributions), len(lengths), iterations))
-
-
-
+                pool.map(single_run_helper, args)

@@ -55,8 +55,13 @@ if __name__ == "__main__":
             distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{
-        "M": 1,
         "M": 10
+    },
+    {
+        "M": 1
     }]
     # data = exp_manager.run(1, lenghts, algos, distributions, override_constants, 1)
-    data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
+    # data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
+
+    # data = exp_manager.run_on_existing(algos, override_constants, 1)
+    data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
