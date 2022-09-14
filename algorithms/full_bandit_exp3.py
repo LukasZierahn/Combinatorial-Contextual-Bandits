@@ -28,7 +28,7 @@ class FullBanditExp3(Algorithm):
         log_term = np.log(sequence.length * m * sequence.sigma**2 * sequence.R**2)
         log_A = np.log(self.actionset.number_of_actions)
 
-        self.gamma = np.sqrt(log_A * max_term * log_A * log_term / sequence.length)
+        self.gamma = np.sqrt(log_A * max_term * log_term / sequence.length)
         assert self.gamma < 1, f"FullBanditExp3 gamma should be smaller than 1 but is {self.gamma}, for {sequence.name}"
         self.eta = np.sqrt(log_A) / (m * np.sqrt(sequence.length * max_term * log_term))
 
