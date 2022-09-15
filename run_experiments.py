@@ -39,7 +39,7 @@ def get_dist(rng, d, K, m):
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
-    algos = [FullBanditExp3(), FullBanditExp3Inv()]
+    algos = [FullBanditExp3Inv()]
 
     lenghts = [20000]
 
@@ -51,10 +51,9 @@ if __name__ == "__main__":
     distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{
-        "M": 10
     }]
     # data = exp_manager.run(1, lenghts, algos, distributions, override_constants, 1)
-    data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
+    # data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
 
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
-    # data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
+    data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
