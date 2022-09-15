@@ -23,8 +23,10 @@ class FullBanditExp3Inv(FullBanditExp3):
             action_matrix += np.outer(weighted_action, weighted_action) / d
 
         tensor = np.einsum("ab,cd->cadb", np.identity(d)/d,  action_matrix).reshape((d*K, d*K))
-        inverse = np.linalg.inv(tensor)
+        inverse = np.linalg.inv(tensor + np.identity(d*K) * 1e-5)
+        inverse_tensor = inverse.reshape((self.d, self.d, self.K, self.K))
 
-        self.theta_estimates[self.theta_position] = loss * np.einsum("abcd,b,c", inverse, context, self.actionset[action_index])
+
+        self.theta_estimates[self.theta_position] = loss * np.einsum("abcd,b,c", inverse_tensor, context, self.actionset[action_index])
         self.theta_position += 1 
 
