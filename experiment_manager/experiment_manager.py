@@ -80,6 +80,7 @@ class ExperimentManager:
                         for override_constant in override_constants:
 
                             algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
+                            print("algoname", algo_name)
                             for key, value in override_constant.items():
                                 algo_name += f"{key}={value}"
 
@@ -133,7 +134,11 @@ class ExperimentManager:
                         for override_constant in override_constants:
                             rng, seed_sequence = next_rng(seed_sequence)
 
-                            output_dir = f"output/{dist.name}/{length}/{iteration}"
+                            algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
+                            for key, value in override_constant.items():
+                                algo_name += f"{key}={value}"
+
+                            output_dir = f"output/{dist.name}/{length}/{iteration}/{algo_name}"
                             args.append((rng, algorithm, sequences[dist_index, length_index, iteration], override_constant, output_dir))
         
         self.run_args(args, number_of_processes)
