@@ -4,6 +4,7 @@ import numpy as np
 from algorithms.algorithm import Algorithm
 from distributions.sequence import Sequence
 from misc.matrix_geometric_resampling import matrix_geometric_resampling
+from misc.tensor_helpers import *
 
 class FullBanditExp3(Algorithm):
 
@@ -57,14 +58,11 @@ class FullBanditExp3(Algorithm):
             action_sample_index = rng.choice(np.arange(self.actionset.number_of_actions), p=probabilities)
             action = np.array(self.actionset[action_sample_index], dtype=float)
 
-            d, K = len(context_sample), len(action)
-
-            tensor = np.einsum("a,b,c,d->cadb", context_sample, context_sample, action,  action)
-            return tensor.reshape(d * K, d * K)
+            tensor = np.einsum("a,b,c,d->abcd", context_sample, context_sample, action, action)
+            return tensor_to_matrix(tensor)
 
         inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, unbiased_estimator)
-        inverse_tensor = inverse.reshape((self.d, self.d, self.K, self.K))
 
-        self.theta_estimates[self.theta_position] = loss * np.einsum("abcd,b,c", inverse_tensor, context, self.actionset[action_index])
+        self.theta_estimates[self.theta_position] = loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, self.d, self.actionset.K), context, self.actionset[action_index])
         self.theta_position += 1 
 

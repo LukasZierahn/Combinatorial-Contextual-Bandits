@@ -5,6 +5,7 @@ from algorithms.algorithm import Algorithm
 from algorithms.full_bandit_exp3 import FullBanditExp3
 from distributions.sequence import Sequence
 from misc.matrix_geometric_resampling import matrix_geometric_resampling
+from misc.tensor_helpers import *
 
 class FullBanditExp3Inv(FullBanditExp3):
 
@@ -22,11 +23,9 @@ class FullBanditExp3Inv(FullBanditExp3):
             weighted_action = np.einsum("ab,a->b", self.actionset.actionset, probabilities)
             action_matrix += np.outer(weighted_action, weighted_action) / d
 
-        tensor = np.einsum("ab,cd->cadb", np.identity(d)/d,  action_matrix).reshape((d*K, d*K))
-        inverse = np.linalg.inv(tensor + np.identity(d*K) * 1e-5)
-        inverse_tensor = inverse.reshape((self.d, self.d, self.K, self.K))
+        matrix = tensor_to_matrix(np.einsum("ab,cd->abcd", np.identity(d)/d,  action_matrix))
+        inverse = np.linalg.inv(matrix + np.identity(d*K) * 1e-5)
 
-
-        self.theta_estimates[self.theta_position] = loss * np.einsum("abcd,b,c", inverse_tensor, context, self.actionset[action_index])
+        self.theta_estimates[self.theta_position] = loss * matrix_to_tensor(inverse, d, K)
         self.theta_position += 1 
 

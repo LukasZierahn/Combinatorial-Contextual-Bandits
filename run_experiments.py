@@ -39,21 +39,28 @@ def get_dist(rng, d, K, m):
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
-    algos = [FullBanditExp3Inv()]
+    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), FullBanditExp3(), FullBanditExp3Inv()]
 
     lenghts = [20000]
 
     distributions = []
     K = 3
     m = 2
+    for d in [3, 5, 12]:
+            actionset = MSets(K, m)
+            distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
+
     d = 3
-    actionset = MSets(K, m)
-    distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
+    for K in [5, 8]:
+            actionset = MSets(K, m)
+            distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{
+        "M": 10,
     }]
+    
     # data = exp_manager.run(1, lenghts, algos, distributions, override_constants, 1)
-    # data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
+    data = exp_manager.run(16, lenghts, algos, distributions, override_constants, mp.cpu_count())
 
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
-    data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
+    # data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
