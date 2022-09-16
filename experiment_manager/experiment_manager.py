@@ -63,7 +63,7 @@ class ExperimentManager:
     def __init__(self) -> None:
         self.seed_sequence = None
 
-    def run_on_existing(self, algorithms: List[Algorithm], override_constants: List[Dict[str, float]] = [{}], number_of_processes: int=1, seed: int=0) -> np.ndarray:
+    def run_on_existing(self, algorithms: List[Algorithm], override_constants: List[Dict[str, float]] = [{}], number_of_processes: int=1, seed: int=1) -> np.ndarray:
         seed_sequence = np.random.SeedSequence(seed)
         
         args = []
@@ -82,20 +82,28 @@ class ExperimentManager:
                             algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
                             for key, value in override_constant.items():
                                 algo_name += f"{key}={value}"
+                            
+                            # Make sure we generate an rng if we use the algorithm or not to make sure that the seeds stay aligned
+                            rng, seed_sequence = next_rng(seed_sequence)
 
                             if os.path.isfile(f"output/{dist}/{length}/{iteration}/{algo_name}_general_info.json"):
                                 continue
 
-
                             with open(f"output/{dist}/{length}/{iteration}/sequence.json", "rb") as input_file:
                                 sequence = pickle.load(input_file)
 
-                                rng, seed_sequence = next_rng(seed_sequence)
 
                                 output_dir = f"output/{dist}/{length}/{iteration}/{algo_name}"
                                 args.append((rng, algorithm, sequence, override_constant, output_dir))
 
-        self.run_args(args, number_of_processes)
+        print("Starting", len(args), "runs")
+        if number_of_processes == 1:
+            for arg in args:
+                single_run_helper(arg)
+        else:
+            import multiprocessing as mp
+            with mp.Pool(number_of_processes) as pool:
+                pool.map(single_run_helper, args)
                         
     def generate_sequences(self, seed_sequence: np.random.SeedSequence, iterations: int, lengths: List[int], distributions: List[Distribution]) -> np.ndarray:
         sequences = np.zeros((len(distributions), len(lengths), iterations), dtype=object)
@@ -106,18 +114,14 @@ class ExperimentManager:
                     sequences[dist_index, length_index, iteration] = dist.generate(length, np.random.default_rng(context_seed), np.random.default_rng(theta_seed))
         return sequences
     
-
-    def run(self, iterations: int, lengths: List[int], algorithms: List[Algorithm], distributions: List[Distribution], override_constants: List[Dict[str, float]] = [{}], number_of_processes: int=1, seed: int=0) -> np.ndarray:
-
+    def create_output_dir(self, iterations: int, lengths: List[int], distributions: List[Distribution], seed: int=0) -> np.ndarray:
+        if "output" in os.listdir():
+            print("Ouput already exists, not creating any new sequences")
+            return
+        print(f"Creating sequences with seed {seed}")
         seed_sequence = np.random.SeedSequence(seed)
         sequences = self.generate_sequences(seed_sequence.spawn(1)[0], iterations, lengths, distributions)
 
-        if "output" in os.listdir():
-            shutil.rmtree("output")
-        os.mkdir("output")
-        
-
-        args = []
         for dist_index, dist in enumerate(distributions):
             os.mkdir(f"output/{dist.name}")
 
@@ -128,26 +132,3 @@ class ExperimentManager:
                     os.mkdir(f"output/{dist.name}/{length}/{iteration}")
                     with open(f"output/{dist.name}/{length}/{iteration}/sequence.json", "wb") as output_file:
                         pickle.dump(sequences[dist_index, length_index, iteration], output_file)
-
-                    for alg_index, algorithm in enumerate(algorithms):
-                        for override_constant in override_constants:
-                            rng, seed_sequence = next_rng(seed_sequence)
-
-                            algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
-                            for key, value in override_constant.items():
-                                algo_name += f"{key}={value}"
-
-                            output_dir = f"output/{dist.name}/{length}/{iteration}/{algo_name}"
-                            args.append((rng, algorithm, sequences[dist_index, length_index, iteration], override_constant, output_dir))
-        
-        self.run_args(args, number_of_processes)
-
-    def run_args(self, args, number_of_processes: int):
-        print("Starting", len(args), "runs")
-        if number_of_processes == 1:
-            for arg in args:
-                single_run_helper(arg)
-        else:
-            import multiprocessing as mp
-            with mp.Pool(number_of_processes) as pool:
-                pool.map(single_run_helper, args)
