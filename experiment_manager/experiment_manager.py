@@ -118,10 +118,12 @@ class ExperimentManager:
         if "output" in os.listdir():
             print("Ouput already exists, not creating any new sequences")
             return
+
         print(f"Creating sequences with seed {seed}")
         seed_sequence = np.random.SeedSequence(seed)
         sequences = self.generate_sequences(seed_sequence.spawn(1)[0], iterations, lengths, distributions)
 
+        os.mkdir("output")
         for dist_index, dist in enumerate(distributions):
             os.mkdir(f"output/{dist.name}")
 
