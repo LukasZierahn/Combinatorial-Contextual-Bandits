@@ -17,9 +17,7 @@ class FullBanditExp3(Algorithm):
 
         self.exploration_bonus = self.actionset.get_johns()
 
-        self.theta_estimates = np.zeros((sequence.length, sequence.d, sequence.K))
-        self.theta_position = 0
-
+        self.theta_estimate = np.zeros((sequence.d, sequence.K))
         self.context_unbiased_estimator = sequence.context_unbiased_estimator
 
         m = self.actionset.m
@@ -37,10 +35,7 @@ class FullBanditExp3(Algorithm):
 
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
-        if self.theta_position == 0:
-            return np.ones(self.actionset.number_of_actions) / self.actionset.number_of_actions
-
-        action_scores = np.einsum("a,bac,ec->e", context, self.theta_estimates[:self.theta_position], self.actionset.actionset)
+        action_scores = np.einsum("a,ac,ec->e", context, self.theta_estimate, self.actionset.actionset)
 
         min_score = np.min(action_scores)
         action_scores_exp = np.exp(-self.eta * (action_scores - min_score))
@@ -63,6 +58,5 @@ class FullBanditExp3(Algorithm):
 
         inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, unbiased_estimator)
 
-        self.theta_estimates[self.theta_position] = loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, self.d, self.actionset.K), context, self.actionset[action_index])
-        self.theta_position += 1 
+        self.theta_estimates += loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, self.d, self.actionset.K), context, self.actionset[action_index])
 
