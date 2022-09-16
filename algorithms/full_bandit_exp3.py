@@ -58,5 +58,5 @@ class FullBanditExp3(Algorithm):
 
         inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, unbiased_estimator)
 
-        self.theta_estimates += loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, self.d, self.actionset.K), context, self.actionset[action_index])
+        self.theta_estimate += loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, self.d, self.actionset.K), context, self.actionset[action_index])
 
