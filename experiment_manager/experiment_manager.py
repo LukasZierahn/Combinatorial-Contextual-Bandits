@@ -80,7 +80,6 @@ class ExperimentManager:
                         for override_constant in override_constants:
 
                             algo_name = re.findall(r"\..*\.(.*)'", str(algorithm.__class__))[0]
-                            print("algoname", algo_name)
                             for key, value in override_constant.items():
                                 algo_name += f"{key}={value}"
 
