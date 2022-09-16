@@ -39,7 +39,7 @@ def get_dist(rng, d, K, m):
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
-    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), FullBanditExp3(), FullBanditExp3Inv()]
+    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), FullBanditExp3Inv()]
 
     lenghts = [20000]
 
@@ -56,7 +56,6 @@ if __name__ == "__main__":
             distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{
-        "M": 10,
     }]
     
     exp_manager.create_output_dir(16, lenghts, distributions)
