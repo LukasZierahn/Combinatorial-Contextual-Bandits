@@ -16,8 +16,7 @@ class SemiBanditExp3(Algorithm):
         self.actionset = sequence.actionset
         self.exploratory_set = self.actionset.get_exploratory_set()
 
-        self.theta_estimates: np.ndarray = np.zeros((sequence.length, sequence.d, sequence.K))
-        self.theta_position = 0
+        self.theta_estimate: np.ndarray = np.zeros((sequence.d, sequence.K))
 
         self.context_unbiased_estimator = sequence.context_unbiased_estimator
 
@@ -36,7 +35,7 @@ class SemiBanditExp3(Algorithm):
 
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
-        action_scores = np.einsum("a,bac,ec->e", context, self.theta_estimates[:self.theta_position], self.actionset.actionset)
+        action_scores = np.einsum("a,ac,ec->e", context, self.theta_estimate, self.actionset.actionset)
 
         min_score = np.min(action_scores)
         action_scores_exp = np.exp(-self.eta * (action_scores - min_score))
@@ -59,7 +58,7 @@ class SemiBanditExp3(Algorithm):
 
         for i in range(self.actionset.K):
             inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, partial(unbiased_estimator, i))
-            self.theta_estimates[self.theta_position, :, i] = inverse @ context * loss_vec[i]
+            self.theta_estimate[:, i] += inverse @ context * loss_vec[i]
 
         self.theta_position += 1 
 

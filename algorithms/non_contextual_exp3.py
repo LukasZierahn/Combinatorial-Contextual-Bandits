@@ -16,8 +16,7 @@ class NonContextualExp3(Algorithm):
         super().set_constants(rng, sequence)
 
         self.actionset = sequence.actionset
-        self.theta_estimates: np.ndarray = np.zeros((sequence.length, sequence.K))
-        self.theta_position = 0
+        self.theta_estimate: np.ndarray = np.zeros(sequence.K)
 
         self.exploratory_set = sequence.actionset.get_exploratory_set()
     
@@ -30,7 +29,7 @@ class NonContextualExp3(Algorithm):
         self.eta = np.sqrt(log_actionset / (m * denominator))
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
-        action_scores = np.einsum("ac,ec->e", self.theta_estimates[:self.theta_position], self.actionset.actionset)
+        action_scores = np.einsum("c,ec->e", self.theta_estimate, self.actionset.actionset)
 
         min_score = np.min(action_scores)
         action_scores_exp = np.exp(-self.eta * (action_scores - min_score))
@@ -43,12 +42,10 @@ class NonContextualExp3(Algorithm):
         return probabilities
     
     def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):
-        self.theta_estimates[self.theta_position] = loss_vec
-        self.theta_position += 1 
+        self.theta_estimate += loss_vec
     
     def observe_loss(self, loss: float, context: np.ndarray, action_index: int):
         probabilities = self.get_policy(None)
         P = np.einsum("e,ef,eg->fg", probabilities, self.actionset.actionset, self.actionset.actionset)
 
-        self.theta_estimates[self.theta_position] = loss * np.linalg.inv(P) @ self.actionset[action_index]
-        self.theta_position += 1 
+        self.theta_estimate += loss * np.linalg.inv(P) @ self.actionset[action_index]

@@ -13,17 +13,18 @@ class FullBanditExp3Inv(FullBanditExp3):
         K = self.actionset.K
         d = len(context)
 
-        action_matrix = np.zeros((K, K))
+        tensor = np.zeros((d, d, K, K))
         for i in range(d):
             context_curr = np.zeros(d)
             context_curr[i] = 1
 
             probabilities = self.get_policy(context_curr)
             weighted_action = np.einsum("ab,a->b", self.actionset.actionset, probabilities)
-            action_matrix += np.outer(weighted_action, weighted_action) / d
+            action_matrix = np.outer(weighted_action, weighted_action)
+            tensor += np.einsum("ab,cd->abcd", np.outer(context_curr, context_curr) / d,  action_matrix)
 
-        matrix = tensor_to_matrix(np.einsum("ab,cd->abcd", np.identity(d)/d,  action_matrix))
-        inverse = np.linalg.inv(matrix + np.identity(d*K) * 1e-5)
+        matrix = tensor_to_matrix(tensor)
+        inverse = np.linalg.inv(matrix + np.identity(d*K) * 1e-3)
 
-        self.theta_estimates = loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, d, K), context, self.actionset[action_index])
+        self.theta_estimate += loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, d, K), context, self.actionset[action_index])
 
