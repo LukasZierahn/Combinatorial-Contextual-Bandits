@@ -39,7 +39,7 @@ def get_dist(rng, d, K, m):
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
-    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), FullBanditExp3Inv(), FullBanditExp3()]
+    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), FullBanditExp3Inv()]
 
     lenghts = [100000]
 
