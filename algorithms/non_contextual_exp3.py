@@ -48,4 +48,4 @@ class NonContextualExp3(Algorithm):
         probabilities = self.get_policy(None)
         P = np.einsum("e,ef,eg->fg", probabilities, self.actionset.actionset, self.actionset.actionset)
 
-        self.theta_estimate += loss * np.linalg.inv(P) @ self.actionset[action_index]
+        self.theta_estimate += loss * np.linalg.inv(P + np.identity(len(P)) * 1e-3) @ self.actionset[action_index]
