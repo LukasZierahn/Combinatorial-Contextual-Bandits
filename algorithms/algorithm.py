@@ -9,9 +9,7 @@ from distributions.sequence import Sequence
 class Algorithm(ABC):
     def __init__(self) -> None:
         self.full_bandit = False
-        self.theta_estimates = None
-        self.theta_position = 0
-
+        
         self.d: int = None
         self.K: int = None
         self.length: int = None

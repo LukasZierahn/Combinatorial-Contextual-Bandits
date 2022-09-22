@@ -60,5 +60,3 @@ class SemiBanditExp3(Algorithm):
             inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, partial(unbiased_estimator, i))
             self.theta_estimate[:, i] += inverse @ context * loss_vec[i]
 
-        self.theta_position += 1 
-
