@@ -20,8 +20,7 @@ class SemiBanditFTRL(Algorithm):
         self.actionset = sequence.actionset
         self.exploratory_set = self.actionset.get_exploratory_set()
 
-        self.theta_estimates: np.ndarray = np.zeros((sequence.length, sequence.d, sequence.K))
-        self.theta_position = 0
+        self.theta_estimate: np.ndarray = np.zeros((sequence.length, sequence.d, sequence.K))
 
         self.context_unbiased_estimator = sequence.context_unbiased_estimator
 
@@ -40,10 +39,7 @@ class SemiBanditFTRL(Algorithm):
 
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
-        if self.theta_position == 0:
-            return np.ones(self.K) / self.K
-
-        action_scores = self.actionset.ftrl_routine(context, self.mgr_rng, self)
+        action_scores = self.actionset.ftrl_routine(context, self.rng, self)
         exploration_bonus = self.actionset.get_exploratory_set()
 
         probabilities = (1 - self.gamma) * action_scores + self.gamma * exploration_bonus
@@ -61,7 +57,5 @@ class SemiBanditFTRL(Algorithm):
 
         for i in range(self.actionset.K):
             inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, partial(unbiased_estimator, i))
-            self.theta_estimates[self.theta_position, :, i] = inverse @ context * loss_vec[i]
-
-        self.theta_position += 1 
+            self.theta_estimate[:, i] += inverse @ context * loss_vec[i]
 

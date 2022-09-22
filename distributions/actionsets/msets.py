@@ -42,7 +42,7 @@ class MSets(Actionset):
         return np.array(buffer)
 
     def ftrl_routine(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
-        actions = np.exp(-1 * ftrl_algorithm.eta * np.einsum("a,bac->c", context, ftrl_algorithm.theta_estimates[:ftrl_algorithm.theta_position]))
+        actions = np.exp(-1 * ftrl_algorithm.eta * np.einsum("a,bac->c", context, ftrl_algorithm.theta_estimate))
         return actions / np.sum(actions)
         
 
