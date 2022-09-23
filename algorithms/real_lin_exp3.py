@@ -27,6 +27,7 @@ class RealLinExp3(Algorithm):
         self.eta = np.sqrt(np.log(number_of_actions) / (self.sequence.d * number_of_actions * sequence.length * log_term))
 
         self.M = int(np.ceil(number_of_actions * sequence.sigma**2 * log_term / (self.gamma * sequence.lambda_min)))
+        #if self.eta > 2 / (self.M + 1): raise Exception(f"self.eta > 2 / (self.M + 1) violated for eta {self.eta} and M {self.M} ({2 / (self.M + 1)})")
 
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
@@ -52,5 +53,5 @@ class RealLinExp3(Algorithm):
             matrix += probabilities[action_index] * np.outer(context_curr, context_curr)
 
 
-        inverse = np.linalg.inv(matrix)
+        inverse = np.linalg.inv(matrix + np.identity(d) * 1e-3)
         self.theta_estimates[action_index] += inverse @ context * loss

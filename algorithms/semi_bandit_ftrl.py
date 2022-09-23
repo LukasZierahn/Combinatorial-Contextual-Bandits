@@ -40,9 +40,7 @@ class SemiBanditFTRL(Algorithm):
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
         action_scores = self.actionset.ftrl_routine(context, self.rng, self)
-        exploration_bonus = self.actionset.get_exploratory_set()
-
-        probabilities = (1 - self.gamma) * action_scores + self.gamma * exploration_bonus
+        probabilities = (1 - self.gamma) * action_scores + self.gamma * self.exploratory_set
         return probabilities
 
     

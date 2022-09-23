@@ -12,8 +12,11 @@ class NonContextualExp3(Algorithm):
 
         self.full_bandit = full_bandit
 
-    def set_constants(self, rng: np.random.Generator, sequence: Sequence):
+    def set_constants(self, rng: np.random.Generator, sequence: Sequence, override_length: int=None):
         super().set_constants(rng, sequence)
+        length = override_length
+        if length is not None:
+            length = sequence.length
 
         self.actionset = sequence.actionset
         self.theta_estimate: np.ndarray = np.zeros(sequence.K)
@@ -21,7 +24,7 @@ class NonContextualExp3(Algorithm):
         self.exploratory_set = sequence.actionset.get_exploratory_set()
     
         m = self.actionset.m
-        denominator = sequence.length * (self.K / m) + 2 * self.K
+        denominator = length * (self.K / m) + 2 * self.K
         log_actionset = np.log(len(self.actionset.actionset))
 
         self.gamma = self.K * np.sqrt(m * log_actionset / denominator)

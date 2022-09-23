@@ -21,7 +21,7 @@ class OnePerContext(Algorithm):
         hash = str(context)
         if hash not in self.context_algos:
             new_algo = NonContextualExp3(self.full_bandit)
-            new_algo.set_constants(self.rng, self.sequence)
+            new_algo.set_constants(self.rng, self.sequence, override_length=self.sequence.length/self.d)
             self.context_algos[hash] = new_algo
         
         return self.context_algos[hash].get_policy(None)
