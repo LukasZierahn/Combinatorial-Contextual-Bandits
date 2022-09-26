@@ -20,7 +20,7 @@ class SemiBanditFTRL(Algorithm):
         self.actionset = sequence.actionset
         self.exploratory_set = self.actionset.get_exploratory_set()
 
-        self.theta_estimate: np.ndarray = np.zeros((sequence.length, sequence.d, sequence.K))
+        self.theta_estimate: np.ndarray = np.zeros((sequence.d, sequence.K))
 
         self.context_unbiased_estimator = sequence.context_unbiased_estimator
 

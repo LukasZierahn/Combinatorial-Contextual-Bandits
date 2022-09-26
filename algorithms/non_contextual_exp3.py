@@ -20,8 +20,6 @@ class NonContextualExp3(Algorithm):
 
         self.actionset = sequence.actionset
         self.theta_estimate: np.ndarray = np.zeros(sequence.K)
-
-        self.exploratory_set = sequence.actionset.get_exploratory_set()
     
         m = self.actionset.m
         denominator = length * (self.K / m) + 2 * self.K
@@ -38,8 +36,7 @@ class NonContextualExp3(Algorithm):
         action_scores_exp = np.exp(-self.eta * (action_scores - min_score))
         action_scores_exp /= np.sum(action_scores_exp)
 
-        exploration_bonus = np.zeros(len(action_scores))
-        exploration_bonus[self.exploratory_set] += 1/len(self.exploratory_set)
+        exploration_bonus = np.zeros(len(action_scores)) + 1/len(action_scores)
 
         probabilities = (1 - self.gamma) * action_scores_exp + self.gamma * exploration_bonus
         return probabilities

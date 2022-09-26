@@ -39,9 +39,9 @@ def single_run(rng: np.random.Generator, algorithm: Algorithm, sequence: Sequenc
     loss_of_optimal_policy, _, _ = sequence.find_optimal_policy()
 
     if output_dir != "":
-        np.savetxt(f"{output_dir}_losses.csv", losses) 
-        np.savetxt(f"{output_dir}_probability_array.csv", probability_array) 
-        np.savetxt(f"{output_dir}_action_array.csv", action_array)
+        # np.savetxt(f"{output_dir}_losses.csv", losses) 
+        # np.savetxt(f"{output_dir}_probability_array.csv", probability_array) 
+        # np.savetxt(f"{output_dir}_action_array.csv", action_array)
 
         general_info = {
             "regret": loss - loss_of_optimal_policy,

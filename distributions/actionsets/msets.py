@@ -16,6 +16,20 @@ def generate_mset(K: int, number_of_ones: int) -> np.ndarray:
     leading_true = np.append(generate_mset(K - 1, number_of_ones - 1), np.ones((comb(K-1, number_of_ones - 1), 1), dtype=bool), axis=1)
     return np.append(leading_false, leading_true, axis=0)
 
+def capping_algorithm(probability_vector, set_size):
+    # projecting down to the right subspace
+    sort_indices = np.argsort(probability_vector)[::-1]
+
+    for i in range(len(sort_indices)):
+        probability_vector /= np.sum(probability_vector)
+        active_index = sort_indices[i]
+        if probability_vector[active_index] <= 1/set_size:
+            break
+
+        probability_vector[active_index] = 1/set_size
+        probability_vector[sort_indices[i + 1:]] *= (set_size - (i + 1))/(set_size * np.sum(probability_vector[sort_indices[i + 1:]]))
+
+    return probability_vector
 
 class MSets(Actionset):
 
@@ -39,11 +53,31 @@ class MSets(Actionset):
             index = (np.all(self.actionset == next_vec, axis=1)).nonzero()[0][0]
             buffer.append(index)
 
-        return np.array(buffer)
+        indices = np.zeros(len(self.actionset))
+        indices[np.array(buffer)] = 1/len(buffer)
+        return indices
 
     def ftrl_routine(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
-        optimal_action = np.exp(-1 * ftrl_algorithm.eta * np.einsum("a,bac->c", context, ftrl_algorithm.theta_estimate))
-        return optimal_action / np.sum(optimal_action)
+        optimal_action = np.exp(-1 * ftrl_algorithm.eta * np.einsum("a,ac->c", context, ftrl_algorithm.theta_estimate))
+        
+        # decomposing greedily to actions
+        weights = np.zeros(len(self.actionset))
+        left_over = capping_algorithm(optimal_action, self.m) * self.m
+        while np.linalg.norm(left_over) > 1e-5:
+            sort_indices = np.argsort(left_over)[::-1]
+
+            action = np.zeros(self.K, dtype=bool)
+            action[sort_indices[:self.m]] = True
+            index = (np.all(self.actionset == action, axis=1)).nonzero()[0][0]
+
+            size = np.min([left_over[sort_indices[self.m - 1]], np.sum(left_over / self.m) - np.max(left_over[~action])])
+            weights[index] += size
+            left_over -= size * action.astype(float)
+
+        # Sometimes there is some floating point imprecision so we rescale just in case
+        weights /= np.sum(weights)
+
+        return weights
         
 
     def ftrl_routine_slow(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):

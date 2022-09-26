@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from algorithms.full_bandit_exp3_inv import FullBanditExp3Inv
+from algorithms.real_lin_exp3 import RealLinExp3
+from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLInv
 
 from distributions.distribution_by_sequence import DistributionBySequence
 from distributions.distribution import Distribution
@@ -39,7 +41,7 @@ def get_dist(rng, d, K, m):
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
-    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), FullBanditExp3Inv()]
+    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
 
     lenghts = [100000]
 

@@ -50,7 +50,7 @@ class RealLinExp3(Algorithm):
             context_curr[i] = 1
 
             probabilities = self.get_policy(context_curr)
-            matrix += probabilities[action_index] * np.outer(context_curr, context_curr)
+            matrix += probabilities[action_index] * np.outer(context_curr, context_curr) / d
 
 
         inverse = np.linalg.inv(matrix + np.identity(d) * 1e-3)
