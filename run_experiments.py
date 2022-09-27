@@ -33,7 +33,7 @@ def get_dist(rng, d, K, m):
             index = rng.integers(K)
             if index not in placed_already:
                 placed_already.append(index)
-                p[i, index] = 0.3
+                p[i, index] -= 0.05
     
     return IndependentBernoulli(d, K, p)
 
@@ -46,9 +46,8 @@ if __name__ == "__main__":
     lenghts = [100000]
 
     distributions = []
-    m = 2
     for d in [3, 5, 12]:
-        for K in [3, 5, 8]:
+        for K, m in [(3, 1), (5, 2), (8, 3)]:
             actionset = MSets(K, m)
             distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
 

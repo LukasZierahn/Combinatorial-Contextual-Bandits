@@ -15,7 +15,7 @@ class NonContextualExp3(Algorithm):
     def set_constants(self, rng: np.random.Generator, sequence: Sequence, override_length: int=None):
         super().set_constants(rng, sequence)
         length = override_length
-        if length is not None:
+        if length is None:
             length = sequence.length
 
         self.actionset = sequence.actionset
