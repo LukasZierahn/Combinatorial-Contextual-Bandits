@@ -45,12 +45,10 @@ class RealLinExp3(Algorithm):
     def observe_loss(self, loss: float, context: np.ndarray, action_index: int):
         d = len(context)
         matrix = np.zeros((d, d))
-        for i in range(d):
-            context_curr = np.zeros(d)
-            context_curr[i] = 1
-
+        for context_probability, context_curr in self.context_list:
+            
             probabilities = self.get_policy(context_curr)
-            matrix += probabilities[action_index] * np.outer(context_curr, context_curr) / d
+            matrix += probabilities[action_index] * context_probability * np.outer(context_curr, context_curr)
 
 
         inverse = np.linalg.inv(matrix + np.identity(d) * 1e-3)

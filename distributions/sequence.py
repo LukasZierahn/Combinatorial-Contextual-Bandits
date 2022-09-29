@@ -18,6 +18,8 @@ class Sequence:
         self.rng: np.random.Generator           = None
 
         self.context_unbiased_estimator: Callable[[np.random.Generator], np.ndarray] = None
+        self.context_list: np.ndarray = None
+
         self.sigma: float       = None
         self.lambda_min: float  = None
         self.R: float           = None
@@ -66,6 +68,7 @@ class Sequence:
 
         self.sigma = contexts.true_sigma
         self.context_unbiased_estimator = contexts.unbiased_sample
+        self.context_list = contexts.get_context_probabilities()
         self.lambda_min = contexts.lambda_min
 
     def set_theta(self, theta: Thetas, rng: np.random.Generator):

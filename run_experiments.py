@@ -46,14 +46,14 @@ if __name__ == "__main__":
     lenghts = [100000]
 
     distributions = []
-    for d in [3, 5, 12]:
+    for d, number_of_ones in [(3, 1), (5, 2), (12, 3)]:
         for K, m in [(3, 1), (5, 2), (8, 3)]:
             actionset = MSets(K, m)
-            distributions.append(Distribution(BinaryContext(d), get_dist(rng, d, K, m), actionset))
+            distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{
     }]
     
-    exp_manager.create_output_dir(25, lenghts, distributions)
+    exp_manager.create_output_dir(5, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
     data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())

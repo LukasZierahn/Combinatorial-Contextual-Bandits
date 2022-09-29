@@ -15,6 +15,8 @@ class Algorithm(ABC):
         self.length: int = None
         self.actionset: Actionset = None
 
+        self.context_list: np.ndarray = None
+
         self.beta: float    = None
         self.gamma: float   = None
         self.eta: float     = None
@@ -27,6 +29,7 @@ class Algorithm(ABC):
         self.K = sequence.K
         self.length = sequence.length
         self.actionset = sequence.actionset
+        self.context_list = sequence.context_list
         self.sequence = sequence
 
     @abstractmethod

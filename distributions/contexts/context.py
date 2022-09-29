@@ -18,6 +18,10 @@ class Context(ABC):
             result[i] = self.unbiased_sample(rng)
         return result
 
+
+    def get_context_probabilities(self):
+        return None
+
     @abstractmethod
     def unbiased_sample(self, rng: np.random.Generator) -> np.ndarray:
         raise NotImplementedError()
