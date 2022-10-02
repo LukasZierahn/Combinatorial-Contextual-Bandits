@@ -33,7 +33,7 @@ def get_dist(rng, d, K, m):
             index = rng.integers(K)
             if index not in placed_already:
                 placed_already.append(index)
-                p[i, index] -= 0.05
+                p[i, index] -= 0.2
     
     return IndependentBernoulli(d, K, p)
 
@@ -42,6 +42,7 @@ if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
     algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+    algos.reverse()
 
     lenghts = [10000]
 

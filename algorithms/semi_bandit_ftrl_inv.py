@@ -21,7 +21,7 @@ class SemiBanditFTRLInv(SemiBanditFTRL):
                 prob_weight = np.sum(action_probabilities * np.array(self.actionset.actionset, dtype=float)[:, i])
                 matrix += prob_weight * context_probability * np.outer(context_curr, context_curr)
 
-            inverse = np.linalg.inv(matrix + np.identity(d) * 1e-5)
+            inverse = np.linalg.inv(matrix)
             self.theta_estimate[:, i] += inverse @ context * loss_vec[i]
 
     """def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):

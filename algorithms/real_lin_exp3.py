@@ -51,5 +51,5 @@ class RealLinExp3(Algorithm):
             matrix += probabilities[action_index] * context_probability * np.outer(context_curr, context_curr)
 
 
-        inverse = np.linalg.inv(matrix + np.identity(d) * 1e-5)
+        inverse = np.linalg.inv(matrix)
         self.theta_estimates[action_index] += inverse @ context * loss
