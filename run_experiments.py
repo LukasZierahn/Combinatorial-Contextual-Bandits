@@ -43,6 +43,29 @@ if __name__ == "__main__":
     exp_manager = ExperimentManager()
     algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
 
+    lenghts = [10000]
+
+    distributions = []
+    d = 4
+    number_of_ones = 2
+    K = 3
+    m = 1
+    actionset = MSets(K, m)
+    distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
+
+    override_constants = [{
+    }]
+    
+    exp_manager.create_output_dir(50, lenghts, distributions)
+    # data = exp_manager.run_on_existing(algos, override_constants, 1)
+    data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
+
+"""
+if __name__ == "__main__":
+    rng = np.random.default_rng(0)
+    exp_manager = ExperimentManager()
+    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+
     lenghts = [100000]
 
     distributions = []
@@ -57,3 +80,4 @@ if __name__ == "__main__":
     exp_manager.create_output_dir(5, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
     data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
+"""
