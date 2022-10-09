@@ -42,10 +42,15 @@ class NonContextualExp3(Algorithm):
         return probabilities
     
     def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):
-        self.theta_estimate += loss_vec
+        probabilities = self.get_policy(None)
+        for i in range(len(loss_vec)):
+            if loss_vec[i] == 0:
+                continue
+
+            self.theta_estimate += loss_vec / np.einsum("a,a->", probabilities, self.actionset[:, i])
     
     def observe_loss(self, loss: float, context: np.ndarray, action_index: int):
         probabilities = self.get_policy(None)
         P = np.einsum("e,ef,eg->fg", probabilities, self.actionset.actionset, self.actionset.actionset)
 
-        self.theta_estimate += loss * np.linalg.inv(P + np.identity(len(P)) * 1e-3) @ self.actionset[action_index]
+        self.theta_estimate += loss * np.linalg.inv(P) @ self.actionset[action_index]
