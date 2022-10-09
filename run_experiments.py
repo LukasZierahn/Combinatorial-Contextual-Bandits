@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from algorithms.full_bandit_exp3_inv import FullBanditExp3Inv
+from algorithms.one_per_context_sb import OnePerContextSB
 from algorithms.real_lin_exp3 import RealLinExp3
 from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLInv
 
@@ -41,7 +42,7 @@ def get_dist(rng, d, K, m):
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
-    algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+    algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     algos.reverse()
 
     lenghts = [100000]
@@ -53,6 +54,8 @@ if __name__ == "__main__":
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{
+
+    },{
         "gamma": 1/np.sqrt(lenghts[0]),
         "eta": 1/np.sqrt(lenghts[0])
     }]
