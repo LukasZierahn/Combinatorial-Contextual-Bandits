@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from algorithms.full_bandit_exp3_inv import FullBanditExp3Inv
+from algorithms.full_bandit_exp3_inv import FullBanditTests
 from algorithms.one_per_context_sb import OnePerContextSB
 from algorithms.real_lin_exp3 import RealLinExp3
 from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLInv
@@ -39,15 +40,13 @@ def get_dist(rng, d, K, m):
     return IndependentBernoulli(d, K, p)
 
 
-class FullBanditTests(FullBanditExp3Inv):
-    pass
-
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     algos = [FullBanditTests()]
+    print(algos[0].__class__)
     algos.reverse()
 
     lenghts = [100000]
