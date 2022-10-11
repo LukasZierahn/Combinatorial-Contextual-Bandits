@@ -24,19 +24,19 @@ class SemiBanditFTRL(Algorithm):
 
         self.context_unbiased_estimator = sequence.context_unbiased_estimator
 
-        self.beta = 1/(2 * (sequence.sigma**2))
-    
-        m = self.actionset.m
-        one_plus_log = 1 + np.log(sequence.K / m)
-        max_term = np.max([sequence.K * sequence.d, len(self.exploratory_set) * m * sequence.sigma**2 * one_plus_log / (self.beta * sequence.lambda_min * np.log(2))])
-        log_term = np.log(np.sqrt(sequence.length) * m * sequence.sigma * sequence.R)
+        self.beta = 1/(sequence.sigma**2)
+        E = len(self.exploratory_set)
+        one_plus_log = 1 + np.log(sequence.K / self.actionset.m)
 
-        self.gamma = np.sqrt(max_term / (sequence.length * m * one_plus_log))
-        if self.gamma > 1: raise Exception(f"gamma should be smaller than 1 but is {self.gamma}, for {sequence.name}")
-        self.eta = np.sqrt(m * one_plus_log / (sequence.length * max_term))
+        self.gamma = sequence.sigma**2 * one_plus_log * E *  np.log(sequence.length)
+        self.gamma /= sequence.length * self.beta * sequence.lambda_min
+        self.gamma = np.sqrt(self.gamma)
 
-        self.M = int(np.ceil(len(self.exploratory_set) * log_term / (self.gamma * self.beta * sequence.lambda_min)))
+        self.M = E * np.log(sequence.length) / (self.gamma * self.beta * sequence.lambda_min)
 
+        eta1 = np.log(2) / (sequence.sigma**2 * (self.M + 1))
+        eta2 = np.sqrt((self.actionset.m * one_plus_log) / (3 * sequence.K * sequence.d * sequence.length))
+        self.eta = np.min([eta1, eta2])
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
         action_scores = self.actionset.ftrl_routine(context, self.rng, self)

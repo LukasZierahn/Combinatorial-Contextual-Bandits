@@ -5,6 +5,7 @@ from algorithms.full_bandit_exp3_inv import FullBanditTests
 from algorithms.one_per_context_sb import OnePerContextSB
 from algorithms.real_lin_exp3 import RealLinExp3
 from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLInv
+from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLDirkTuning
 
 from distributions.distribution_by_sequence import DistributionBySequence
 from distributions.distribution import Distribution
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [FullBanditTests()]
+    algos = [SemiBanditFTRLDirkTuning()]
     print(algos[0].__class__)
     algos.reverse()
 
@@ -57,15 +58,7 @@ if __name__ == "__main__":
             actionset = MSets(K, m)
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
-    override_constants = [{
-
-    },{
-        "gamma": np.sqrt(12 * 8) /np.sqrt(lenghts[0]),
-        "eta": 1/np.sqrt(lenghts[0] * 12 * 8)
-    },{
-        "gamma": 1/np.sqrt(lenghts[0]),
-        "eta": 1/np.sqrt(lenghts[0])
-    }]
+    override_constants = [{}]
     
     exp_manager.create_output_dir(25, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)

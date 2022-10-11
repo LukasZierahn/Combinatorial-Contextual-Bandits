@@ -4,7 +4,6 @@ from algorithms.semi_bandit_ftrl import SemiBanditFTRL
 from distributions.sequence import Sequence
 from misc.matrix_geometric_resampling import matrix_geometric_resampling
 
-
 class SemiBanditFTRLInv(SemiBanditFTRL):
 
     def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):
@@ -48,4 +47,7 @@ class SemiBanditFTRLInv(SemiBanditFTRL):
 
             inverse = np.linalg.inv(matrix + np.identity(d) * 1e-3)
             self.theta_estimate[:, i] += inverse @ context * loss_vec[i]"""
+
+class SemiBanditFTRLDirkTuning(SemiBanditFTRLInv):
+    pass
 
