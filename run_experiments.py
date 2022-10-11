@@ -39,10 +39,15 @@ def get_dist(rng, d, K, m):
     return IndependentBernoulli(d, K, p)
 
 
+class FullBanditTests(FullBanditExp3Inv):
+    pass
+
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
-    algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+    #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+    #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+    algos = [FullBanditTests()]
     algos.reverse()
 
     lenghts = [100000]
@@ -55,6 +60,9 @@ if __name__ == "__main__":
 
     override_constants = [{
 
+    },{
+        "gamma": np.sqrt(12 * 8) /np.sqrt(lenghts[0]),
+        "eta": 1/np.sqrt(lenghts[0] * 12 * 8)
     },{
         "gamma": 1/np.sqrt(lenghts[0]),
         "eta": 1/np.sqrt(lenghts[0])

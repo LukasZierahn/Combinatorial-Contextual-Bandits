@@ -25,7 +25,10 @@ class FullBanditExp3Inv(FullBanditExp3):
             tensor += np.einsum("ab,cd->abcd", context_probability * np.outer(context_curr, context_curr),  action_matrix)
 
         matrix = tensor_to_matrix(tensor)
-        inverse = np.linalg.inv(matrix + np.identity(d*K) * 1e-5)
+        try:
+            inverse = np.linalg.inv(matrix)
+        except:
+            inverse = np.linalg.inv(matrix + np.identity(d*K) * 1e-5)
 
         self.theta_estimate += loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, d, K), context, self.actionset[action_index])
 
