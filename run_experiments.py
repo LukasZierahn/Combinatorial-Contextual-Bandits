@@ -46,7 +46,7 @@ if __name__ == "__main__":
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [UniformRandom()]
+    algos = [FullBanditNewTuning()]
     print(algos[0].__class__)
     algos.reverse()
 
