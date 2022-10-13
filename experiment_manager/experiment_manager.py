@@ -94,7 +94,9 @@ class ExperimentManager:
 
 
                                 output_dir = f"output/{dist}/{length}/{iteration}/{algo_name}"
-                                args.append((rng, algorithm, sequence, override_constant, output_dir))
+
+                                if int(iteration) < 10:
+                                    args.append((rng, algorithm, sequence, override_constant, output_dir))
 
         print("Starting", len(args), "runs")
         if number_of_processes == 1:

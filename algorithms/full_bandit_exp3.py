@@ -21,17 +21,18 @@ class FullBanditExp3(Algorithm):
         self.context_unbiased_estimator = sequence.context_unbiased_estimator
 
         m = self.actionset.m
-        self.beta = 1/(2 * (sequence.sigma**2) * m)
-    
-        max_term = np.max([sequence.K * sequence.d, sequence.K * m * sequence.sigma**2 / sequence.lambda_min])
-        log_term = np.log(sequence.length * m * sequence.sigma**2 * sequence.R**2)
         log_A = np.log(self.actionset.number_of_actions)
 
-        self.gamma = np.sqrt(log_A * max_term * log_term / sequence.length)
-        assert self.gamma < 1, f"FullBanditExp3 gamma should be smaller than 1 but is {self.gamma}, for {sequence.name}"
-        self.eta = np.sqrt(log_A) / (m * np.sqrt(sequence.length * max_term * log_term))
+        self.beta = 1/(2 * (sequence.sigma**2) * m)
+        self.gamma = np.sqrt(sequence.K * np.log(sequence.length) * log_A / (sequence.length * self.beta * sequence.lambda_min))
 
-        self.M = int(np.ceil(sequence.K / (2 * self.beta * self.gamma * sequence.lambda_min) * log_term))
+        M1 = sequence.K * np.log(sequence.length) / (self.beta * sequence.lambda_min)
+        M2 = np.sqrt(sequence.length * sequence.K * np.log(sequence.length) / (log_A * self.beta * sequence.lambda_min))
+        self.M = np.max([M1, M2])
+
+        eta1 = 1/(m * self.M)
+        eta2 = np.sqrt(log_A / (sequence.length * m**2 * sequence.K * sequence.d))
+        self.eta = np.min([eta1, eta2])
 
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
@@ -59,4 +60,3 @@ class FullBanditExp3(Algorithm):
         inverse = matrix_geometric_resampling(self.rng, self.M, self.beta, unbiased_estimator)
 
         self.theta_estimate += loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, self.d, self.actionset.K), context, self.actionset[action_index])
-

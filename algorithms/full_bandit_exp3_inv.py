@@ -32,5 +32,5 @@ class FullBanditExp3Inv(FullBanditExp3):
 
         self.theta_estimate += loss * np.einsum("abcd,b,c", matrix_to_tensor(inverse, d, K), context, self.actionset[action_index])
 
-class FullBanditTests(FullBanditExp3Inv):
+class FullBanditNewTuning(FullBanditExp3Inv):
     pass

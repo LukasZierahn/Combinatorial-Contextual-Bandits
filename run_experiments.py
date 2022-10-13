@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from algorithms.full_bandit_exp3_inv import FullBanditExp3Inv
-from algorithms.full_bandit_exp3_inv import FullBanditTests
+from algorithms.full_bandit_exp3_inv import FullBanditNewTuning
 from algorithms.one_per_context_sb import OnePerContextSB
 from algorithms.real_lin_exp3 import RealLinExp3
 from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLInv
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [SemiBanditFTRLDirkTuning()]
+    algos = [UniformRandom()]
     print(algos[0].__class__)
     algos.reverse()
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             actionset = MSets(K, m)
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
-    override_constants = [{}]
+    override_constants = [{"M": 1}]
     
     exp_manager.create_output_dir(25, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
