@@ -58,7 +58,7 @@ if __name__ == "__main__":
             actionset = MSets(K, m)
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
-    override_constants = [{"M": 1}]
+    override_constants = [{}]
     
     exp_manager.create_output_dir(25, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
