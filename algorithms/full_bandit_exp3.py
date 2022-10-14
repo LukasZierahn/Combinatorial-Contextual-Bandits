@@ -30,7 +30,7 @@ class FullBanditExp3(Algorithm):
         M2 = np.sqrt(sequence.length * sequence.K * np.log(sequence.length) / (log_A * self.beta * sequence.lambda_min))
         self.M = np.max([M1, M2])
 
-        eta1 = 1/(m * self.M)
+        eta1 = 1/(m * (self.M + 1))
         eta2 = np.sqrt(log_A / (sequence.length * m**2 * sequence.K * sequence.d))
         self.eta = np.min([eta1, eta2])
 
