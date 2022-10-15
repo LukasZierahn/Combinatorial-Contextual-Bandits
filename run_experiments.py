@@ -62,6 +62,13 @@ if __name__ == "__main__":
         "gamma": np.sqrt(12 * 8) / np.sqrt(lenghts[0]),
         "eta": 1 / (np.sqrt(12 * 8) * np.sqrt(lenghts[0]))
     }]
+
+    for gamma in [0.1, 0.25]:
+        for eta in [1e-4, 1e-5]:
+            override_constants.append({
+        "gamma": gamma,
+        "eta": eta
+    })
     
     exp_manager.create_output_dir(25, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
