@@ -8,10 +8,10 @@ from algorithms.non_contextual_exp3 import NonContextualExp3
 
 class OnePerContext(Algorithm):
 
-    def __init__(self, full_bandit=True) -> None:
+    def __init__(self) -> None:
         super().__init__()
 
-        self.full_bandit = full_bandit
+        self.full_bandit = True
         self.context_algos: dict[str, Algorithm] = {}
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
@@ -20,9 +20,9 @@ class OnePerContext(Algorithm):
     def get_policy(self, context: np.ndarray) -> np.ndarray:
         hash = str(context)
         if hash not in self.context_algos:
-            new_algo = NonContextualExp3(self.full_bandit)
+            new_algo = NonContextualExp3()
             new_algo.set_constants(self.rng, self.sequence, override_length=self.sequence.length/self.d)
-            
+
             new_algo.gamma = self.gamma if self.gamma is not None else new_algo.gamma
             new_algo.eta = self.eta if self.eta is not None else new_algo.eta
 

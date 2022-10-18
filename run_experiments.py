@@ -38,7 +38,7 @@ def get_dist(rng, d, K, m):
             index = rng.integers(K)
             if index not in placed_already:
                 placed_already.append(index)
-                p[i, index] -= 0.1
+                p[i, index] -= 0.3
     
     return IndependentBernoulli(d, K, p)
 
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [ShortestPath(), OnePerContextSP()]
+    algos = [FullBanditExp3Inv(), UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), ShortestPath(), OnePerContextSP()]
     print(algos[0].__class__)
     algos.reverse()
 
@@ -63,8 +63,8 @@ if __name__ == "__main__":
     override_constants = [{
         
     },{
-        "gamma": 1 / np.sqrt(lenghts[0]),
-        "eta": 1 / np.sqrt(lenghts[0])
+        "gamma": np.sqrt(12 * 8) / np.sqrt(lenghts[0]),
+        "eta": 1 / (np.sqrt(12 * 8) * np.sqrt(lenghts[0]))
     }]
 
     # for gamma in [0.1, 0.25]:
@@ -74,6 +74,6 @@ if __name__ == "__main__":
     #     "eta": eta
     # })
     
-    exp_manager.create_output_dir(25, lenghts, distributions)
+    exp_manager.create_output_dir(10, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
     data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
