@@ -2,10 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from algorithms.full_bandit_exp3_inv import FullBanditExp3Inv
 from algorithms.full_bandit_exp3_inv import FullBanditNewTuning
-from algorithms.one_per_context_sb import OnePerContextSB
 from algorithms.real_lin_exp3 import RealLinExp3
 from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLInv
 from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLDirkTuning
+
+from algorithms.one_per_context_sp import OnePerContextSP
+from algorithms.shortest_path import ShortestPath
 
 from distributions.distribution_by_sequence import DistributionBySequence
 from distributions.distribution import Distribution
@@ -44,9 +46,9 @@ def get_dist(rng, d, K, m):
 if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
-    #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    #algos = [UniformRandom(), OnePerContext(), OnePerContextSB(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [FullBanditExp3Inv()]
+    #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+    #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+    algos = [ShortestPath(), OnePerContextSP()]
     print(algos[0].__class__)
     algos.reverse()
 
@@ -59,16 +61,18 @@ if __name__ == "__main__":
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{
-        "gamma": np.sqrt(12 * 8) / np.sqrt(lenghts[0]),
-        "eta": 1 / (np.sqrt(12 * 8) * np.sqrt(lenghts[0]))
+        
+    },{
+        "gamma": 1 / np.sqrt(lenghts[0]),
+        "eta": 1 / np.sqrt(lenghts[0])
     }]
 
-    for gamma in [0.1, 0.25]:
-        for eta in [1e-4, 1e-5]:
-            override_constants.append({
-        "gamma": gamma,
-        "eta": eta
-    })
+    # for gamma in [0.1, 0.25]:
+    #     for eta in [1e-4, 1e-5]:
+    #         override_constants.append({
+    #     "gamma": gamma,
+    #     "eta": eta
+    # })
     
     exp_manager.create_output_dir(25, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)

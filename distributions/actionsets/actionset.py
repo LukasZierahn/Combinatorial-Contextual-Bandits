@@ -43,7 +43,7 @@ class Actionset():
         return self.actionset.shape[0]
 
     def get_exploratory_set(self):
-        return np.arange(len(self.actionset))
+        return np.ones(len(self.actionset)) / len(self.actionset)
 
     def get_johns(self):
         raise NotImplementedError()

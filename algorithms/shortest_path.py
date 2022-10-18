@@ -5,12 +5,12 @@ from algorithms.algorithm import Algorithm
 from distributions.sequence import Sequence
 from misc.matrix_geometric_resampling import matrix_geometric_resampling
 
-class NonContextualExp3(Algorithm):
+class ShortestPath(Algorithm):
 
-    def __init__(self, full_bandit=True) -> None:
+    def __init__(self) -> None:
         super().__init__()
 
-        self.full_bandit = full_bandit
+        self.full_bandit = False
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence, override_length: int=None):
         super().set_constants(rng, sequence)
@@ -19,15 +19,17 @@ class NonContextualExp3(Algorithm):
             length = sequence.length
 
         self.actionset = sequence.actionset
+        self.exploration_bonus = sequence.actionset.get_exploratory_set()
+        number_of_exploratory_actions = np.sum(self.exploration_bonus != 0)
+
         self.theta_estimate: np.ndarray = np.zeros(sequence.K)
     
         m = self.actionset.m
-        denominator = length * (self.K / m) + 2 * self.K
-        log_actionset = np.log(len(self.actionset.actionset))
+        self.beta = np.sqrt(sequence.K / (length * len(self.actionset.actionset)) * np.log(len(self.actionset.actionset) / 0.95))
 
-        self.gamma = self.K * np.sqrt(m * log_actionset / denominator)
-        if self.gamma > 1: raise Exception(f"gamma should be smaller than 1 but is {self.gamma}, for {sequence.name}")
-        self.eta = np.sqrt(log_actionset / (m * denominator))
+        self.eta = np.sqrt(np.log(length) / (4 * length * sequence.K**2 * number_of_exploratory_actions))
+
+        self.gamma = 2 * self.eta * sequence.K * number_of_exploratory_actions
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
         action_scores = np.einsum("c,ec->e", self.theta_estimate, self.actionset.actionset)
@@ -36,13 +38,11 @@ class NonContextualExp3(Algorithm):
         action_scores_exp = np.exp(-self.eta * (action_scores - min_score))
         action_scores_exp /= np.sum(action_scores_exp)
 
-        exploration_bonus = np.zeros(len(action_scores)) + 1/len(action_scores)
-
-        probabilities = (1 - self.gamma) * action_scores_exp + self.gamma * exploration_bonus
+        probabilities = (1 - self.gamma) * action_scores_exp + self.gamma * self.exploration_bonus
         return probabilities
         
-    def observe_loss(self, loss: float, context: np.ndarray, action_index: int):
+    def observe_loss_vec(self, loss_vec: np.ndarray, context: np.ndarray, action_index: int):
         probabilities = self.get_policy(None)
-        P = np.einsum("e,ef,eg->fg", probabilities, self.actionset.actionset, self.actionset.actionset)
+        chance_of_selecting = np.einsum("e,ef->f", probabilities, self.actionset.actionset)
 
-        self.theta_estimate += loss * np.linalg.inv(P) @ self.actionset[action_index]
+        self.theta_estimate += (loss_vec + self.beta) / chance_of_selecting
