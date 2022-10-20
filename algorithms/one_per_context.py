@@ -40,3 +40,6 @@ class OnePerContext(Algorithm):
     def observe_loss(self, loss: float, context: np.ndarray, action_index: int):
         hash = str(context)
         self.context_algos[hash].observe_loss(loss, None, action_index)
+
+class OnePerContextCorrect(OnePerContext):
+    pass

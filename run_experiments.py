@@ -20,6 +20,7 @@ from algorithms.semi_bandit_ftrl import SemiBanditFTRL
 from algorithms.uniform_random import UniformRandom
 from algorithms.non_contextual_exp3 import NonContextualExp3
 from algorithms.one_per_context import OnePerContext
+from algorithms.one_per_context import OnePerContextCorrect
 
 from experiment_manager.experiment_manager import ExperimentManager
 
@@ -50,7 +51,7 @@ if __name__ == "__main__":
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [Bubeck(), OnePerContextBubeck()]
+    algos = [OnePerContextCorrect()]
     print(algos[0].__class__)
     algos.reverse()
 
@@ -63,8 +64,6 @@ if __name__ == "__main__":
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{
-        
-    },{
         "gamma": 1 / np.sqrt(lenghts[0]),
         "eta": 1 / np.sqrt(lenghts[0])
     }]
