@@ -51,7 +51,7 @@ if __name__ == "__main__":
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [OnePerContextCorrect()]
+    algos = [Bubeck()]
     print(algos[0].__class__)
     algos.reverse()
 
@@ -63,10 +63,7 @@ if __name__ == "__main__":
             actionset = MSets(K, m)
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
-    override_constants = [{}, {
-        "gamma": 1 / np.sqrt(lenghts[0]),
-        "eta": 1 / np.sqrt(lenghts[0])
-    }]
+    override_constants = [{}]
 
     # for gamma in [0.1, 0.25]:
     #     for eta in [1e-4, 1e-5]:

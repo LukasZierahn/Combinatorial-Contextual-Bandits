@@ -19,7 +19,7 @@ class Bubeck(SemiBanditFTRLInv):
 
         self.context_unbiased_estimator = sequence.context_unbiased_estimator
 
-        self.gamma = np.sqrt(sequence.K * sequence.m / length)
+        self.gamma = np.sqrt(sequence.K / (sequence.m * length))
 
         self.eta = np.sqrt(sequence.m * np.log(sequence.K / sequence.m)) / np.sqrt(length * sequence.K)
 
@@ -35,3 +35,6 @@ class Bubeck(SemiBanditFTRLInv):
         chance_of_selecting = np.einsum("e,ef->f", probabilities, self.actionset.actionset)
 
         self.theta_estimate += loss_vec / chance_of_selecting
+
+class BubeckKovermT(Bubeck):
+    pass
