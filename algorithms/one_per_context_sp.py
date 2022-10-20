@@ -13,15 +13,18 @@ class OnePerContextSP(Algorithm):
 
         self.full_bandit = False
         self.context_algos: dict[str, Algorithm] = {}
+        self.context_count: int = None
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
         super().set_constants(rng, sequence)
+
+        self.context_count = len(sequence.context_list)
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
         hash = str(context)
         if hash not in self.context_algos:
             new_algo = ShortestPath()
-            new_algo.set_constants(self.rng, self.sequence, override_length=self.sequence.length/self.d)
+            new_algo.set_constants(self.rng, self.sequence, override_length=self.sequence.length/self.context_count)
             
             new_algo.gamma = self.gamma if self.gamma is not None else new_algo.gamma
             new_algo.eta = self.eta if self.eta is not None else new_algo.eta

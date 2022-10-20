@@ -57,9 +57,8 @@ class MSets(Actionset):
         indices[np.array(buffer)] = 1/len(buffer)
         return indices
 
-    def ftrl_routine(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
-        optimal_action = np.exp(-1 * ftrl_algorithm.eta * np.einsum("a,ac->c", context, ftrl_algorithm.theta_estimate))
-        
+    def ftrl_routine(self, optimal_action: np.ndarray):
+
         # decomposing greedily to actions
         weights = np.zeros(len(self.actionset))
         left_over = capping_algorithm(optimal_action, self.m) * self.m

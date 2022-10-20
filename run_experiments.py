@@ -4,10 +4,12 @@ from algorithms.full_bandit_exp3_inv import FullBanditExp3Inv
 from algorithms.full_bandit_exp3_inv import FullBanditNewTuning
 from algorithms.real_lin_exp3 import RealLinExp3
 from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLInv
-from algorithms.semi_bandit_ftrl_inv import SemiBanditFTRLDirkTuning
 
 from algorithms.one_per_context_sp import OnePerContextSP
 from algorithms.shortest_path import ShortestPath
+
+from algorithms.one_per_context_bubeck import OnePerContextBubeck
+from algorithms.bubeck import Bubeck
 
 from distributions.distribution_by_sequence import DistributionBySequence
 from distributions.distribution import Distribution
@@ -48,7 +50,7 @@ if __name__ == "__main__":
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [FullBanditExp3Inv(), UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), ShortestPath(), OnePerContextSP()]
+    algos = [Bubeck(), OnePerContextBubeck()]
     print(algos[0].__class__)
     algos.reverse()
 
@@ -63,8 +65,8 @@ if __name__ == "__main__":
     override_constants = [{
         
     },{
-        "gamma": np.sqrt(12 * 8) / np.sqrt(lenghts[0]),
-        "eta": 1 / (np.sqrt(12 * 8) * np.sqrt(lenghts[0]))
+        "gamma": 1 / np.sqrt(lenghts[0]),
+        "eta": 1 / np.sqrt(lenghts[0])
     }]
 
     # for gamma in [0.1, 0.25]:
@@ -74,6 +76,6 @@ if __name__ == "__main__":
     #     "eta": eta
     # })
     
-    exp_manager.create_output_dir(10, lenghts, distributions)
+    exp_manager.create_output_dir(25, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
     data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())

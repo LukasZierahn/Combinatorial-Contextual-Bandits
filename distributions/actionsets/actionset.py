@@ -58,7 +58,7 @@ class Actionset():
                 boundary_points.append(index)
         return np.array(boundary_points)
     
-    def ftrl_routine(self, context: np.ndarray, rng: np.random.Generator, ftrl_algorithm):
+    def ftrl_routine(self, optimal_action):
         raise NotImplementedError()
 
 

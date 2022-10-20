@@ -39,7 +39,9 @@ class SemiBanditFTRL(Algorithm):
         self.eta = np.min([eta1, eta2])
 
     def get_policy(self, context: np.ndarray) -> np.ndarray:
-        action_scores = self.actionset.ftrl_routine(context, self.rng, self)
+        optimal_action = np.exp(-1 * self.eta * np.einsum("a,ac->c", context, self.theta_estimate))
+
+        action_scores = self.actionset.ftrl_routine(optimal_action)
         probabilities = (1 - self.gamma) * action_scores + self.gamma * self.exploratory_set
         return probabilities
 

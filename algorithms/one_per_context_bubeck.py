@@ -4,15 +4,16 @@ import numpy as np
 from algorithms.algorithm import Algorithm
 from distributions.sequence import Sequence
 
-from algorithms.non_contextual_exp3 import NonContextualExp3
+from algorithms.bubeck import Bubeck
 
-class OnePerContext(Algorithm):
+class OnePerContextBubeck(Algorithm):
 
     def __init__(self) -> None:
         super().__init__()
 
-        self.full_bandit = True
+        self.full_bandit = False
         self.context_algos: dict[str, Algorithm] = {}
+        self.context_count: int = None
 
     def set_constants(self, rng: np.random.Generator, sequence: Sequence):
         super().set_constants(rng, sequence)
@@ -22,9 +23,9 @@ class OnePerContext(Algorithm):
     def get_policy(self, context: np.ndarray) -> np.ndarray:
         hash = str(context)
         if hash not in self.context_algos:
-            new_algo = NonContextualExp3()
+            new_algo = Bubeck()
             new_algo.set_constants(self.rng, self.sequence, override_length=self.sequence.length/self.context_count)
-
+            
             new_algo.gamma = self.gamma if self.gamma is not None else new_algo.gamma
             new_algo.eta = self.eta if self.eta is not None else new_algo.eta
 
