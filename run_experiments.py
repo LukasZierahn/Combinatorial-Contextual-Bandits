@@ -63,7 +63,10 @@ if __name__ == "__main__":
             actionset = MSets(K, m)
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
-    override_constants = [{}]
+    override_constants = [{}, {
+        "gamma": 1/100000,
+        "eta": 1/100000,
+    }]
 
     # for gamma in [0.1, 0.25]:
     #     for eta in [1e-4, 1e-5]:

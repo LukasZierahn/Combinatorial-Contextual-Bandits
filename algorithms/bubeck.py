@@ -35,6 +35,3 @@ class Bubeck(SemiBanditFTRLInv):
         chance_of_selecting = np.einsum("e,ef->f", probabilities, self.actionset.actionset)
 
         self.theta_estimate += loss_vec / chance_of_selecting
-
-class BubeckKovermT(Bubeck):
-    pass
