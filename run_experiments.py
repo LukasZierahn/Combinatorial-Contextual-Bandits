@@ -50,8 +50,8 @@ if __name__ == "__main__":
     rng = np.random.default_rng(0)
     exp_manager = ExperimentManager()
     #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    #algos = [UniformRandom(), OnePerContext(), NonContextualExp3(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
-    algos = [Bubeck()]
+    algos = [UniformRandom(), OnePerContextBubeck(), Bubeck(), RealLinExp3(), SemiBanditFTRLInv(), FullBanditExp3Inv()]
+    #algos = [Bubeck()]
     print(algos[0].__class__)
     algos.reverse()
 
