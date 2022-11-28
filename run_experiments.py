@@ -58,8 +58,8 @@ if __name__ == "__main__":
     lenghts = [100000]
 
     distributions = []
-    for d, number_of_ones in [(3, 1), (5, 2), (12, 3)]:
-        for K, m in [(3, 1), (5, 2), (8, 3)]:
+    for d, number_of_ones in [(4, 1), (5, 2), (6, 3)]:
+        for K, m in [(3, 1), (4, 2), (5, 3)]:
             actionset = MSets(K, m)
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
