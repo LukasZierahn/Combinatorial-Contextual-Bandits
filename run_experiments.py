@@ -77,4 +77,4 @@ if __name__ == "__main__":
     
     exp_manager.create_output_dir(25, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
-    data = exp_manager.run_on_existing(algos, override_constants, mp.cpu_count())
+    data = exp_manager.run_on_existing(algos, override_constants, 4)
