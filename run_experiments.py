@@ -64,8 +64,8 @@ if __name__ == "__main__":
             distributions.append(Distribution(BinaryContext(d, number_of_ones), get_dist(rng, d, K, m), actionset))
 
     override_constants = [{}, {
-        "gamma": 1/100000,
-        "eta": 1/100000,
+        "gamma": 1/np.sqrt(100000),
+        "eta": 1/np.sqrt(100000),
     }]
 
     # for gamma in [0.1, 0.25]:
@@ -77,4 +77,4 @@ if __name__ == "__main__":
     
     exp_manager.create_output_dir(25, lenghts, distributions)
     # data = exp_manager.run_on_existing(algos, override_constants, 1)
-    data = exp_manager.run_on_existing(algos, override_constants, 4)
+    data = exp_manager.run_on_existing(algos, override_constants, 5)
